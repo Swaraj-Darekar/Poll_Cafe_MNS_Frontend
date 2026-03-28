@@ -12,10 +12,19 @@ export const testBackendConnection = async () => {
     }
 };
 
-// Settings
+// Settings cache
+let cachedSettings = null;
+let lastSettingsFetch = 0;
+
 export const getSettings = async () => {
+    const now = Date.now();
+    if (cachedSettings && (now - lastSettingsFetch < 60000)) {
+        return cachedSettings;
+    }
     const response = await fetch(`${API_BASE_URL}/settings/`);
-    return await response.json();
+    cachedSettings = await response.json();
+    lastSettingsFetch = now;
+    return cachedSettings;
 };
 
 export const updateSettings = async (settings) => {

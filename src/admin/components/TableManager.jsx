@@ -46,12 +46,20 @@ const TableManager = ({ onUpdateStats }) => {
         setSettings(settingsData);
       }
 
-      const mappedTables = tablesData.map(t => {
-        const activeSession = activeSessionsData.find(s => String(s.table_id) === String(t.id));
+      const activeSessionsMap = activeSessionsData.reduce((acc, cur) => {
+        acc[String(cur.table_id)] = cur;
+        return acc;
+      }, {});
 
-        if (activeSession) {
-          localStorage.setItem(`session_${t.id}`, activeSession.id);
-        }
+      // Defer localStorage writes
+      Promise.resolve().then(() => {
+        activeSessionsData.forEach(session => {
+            localStorage.setItem(`session_${session.table_id}`, session.id);
+        });
+      });
+
+      const mappedTables = tablesData.map(t => {
+        const activeSession = activeSessionsMap[String(t.id)];
 
         const isRunning = activeSession ? true : t.status === 'occupied';
 
@@ -171,28 +179,55 @@ const TableManager = ({ onUpdateStats }) => {
       return;
     }
 
+    const tableId = selectedTable.id;
+    const previousTables = [...tables];
+    const previousSessions = { ...activeSessions };
+    const tempSessionId = `temp_${Date.now()}`;
+    const nameToSave = formData.name;
+    const phoneToSave = formData.phone;
+    const bookingIdToSave = foundBooking?.id || null;
+
+    // Optimistically update UI instantly
+    setTables(prev => prev.map(t => 
+        t.id === tableId ? { 
+            ...t, 
+            isRunning: true, 
+            customerName: nameToSave, 
+            customerPhone: phoneToSave,
+            startTime: Date.now(),
+            sessionId: tempSessionId
+        } : t
+    ));
+    setActiveSessions(prev => ({ ...prev, [tableId]: tempSessionId }));
+    
+    // Close modal instantly for a snappy feel
+    handleModalClose();
+
     try {
-      setIsStarting(true);
       const session = await startSession(
-        selectedTable.id,
-        formData.name,
-        formData.phone,
-        foundBooking?.id || null
+        tableId,
+        nameToSave,
+        phoneToSave,
+        bookingIdToSave
       );
 
       if (session && !session.error && !session.detail) {
-        setActiveSessions(prev => ({ ...prev, [selectedTable.id]: session.id }));
-        localStorage.setItem(`session_${selectedTable.id}`, session.id);
-        await fetchTables();
-        handleModalClose();
+        // Re-align with real DB session ID
+        setActiveSessions(prev => ({ ...prev, [tableId]: session.id }));
+        localStorage.setItem(`session_${tableId}`, session.id);
+        setTables(prev => prev.map(t => t.id === tableId ? { ...t, sessionId: session.id } : t));
+        fetchTables(); // Sync silently
       } else {
+        // Rollback
+        setTables(previousTables);
+        setActiveSessions(previousSessions);
         alert("Failed to start table: " + (session.detail || "Unknown error"));
       }
     } catch (error) {
+      setTables(previousTables);
+      setActiveSessions(previousSessions);
       console.error('Error starting table:', error);
       alert("An unexpected error occurred.");
-    } finally {
-      setIsStarting(false);
     }
   };
 
@@ -230,26 +265,45 @@ const TableManager = ({ onUpdateStats }) => {
 
   const handleMarkAsPaid = async (paymentMethod) => {
     if (!paymentData) return;
-    try {
-      await markPaid(paymentData.sessionId, {
-        total_amount: paymentData.totalAmount,
+    
+    const tableId = paymentData.table.id;
+    const amount = paymentData.totalAmount;
+    const sessionId = paymentData.sessionId;
+    const payloadData = {
+        total_amount: amount,
         gross_amount: paymentData.grossAmount,
         commission_amount: paymentData.commissionAmount,
         duration_minutes: paymentData.durationMinutes,
         payment_method: paymentMethod || 'online'
-      });
-      localStorage.removeItem(`session_${paymentData.table.id}`);
-      setActiveSessions(prev => {
-        const newState = { ...prev };
-        delete newState[paymentData.table.id];
-        return newState;
-      });
-      handleAddSale(paymentData.totalAmount, paymentMethod || 'online');
-      await fetchTables();
-      setIsPaymentModalOpen(false);
-      setPaymentData(null);
+    };
+
+    // Close modal and update UI instantly (Optimistic UI)
+    setIsPaymentModalOpen(false);
+    
+    localStorage.removeItem(`session_${tableId}`);
+    setActiveSessions(prev => {
+      const newState = { ...prev };
+      delete newState[tableId];
+      return newState;
+    });
+    setTables(prev => prev.map(t => t.id === tableId ? {
+        ...t, 
+        isRunning: false, 
+        customerName: '', 
+        customerPhone: '', 
+        startTime: null, 
+        sessionId: null 
+    } : t));
+    
+    handleAddSale(amount, payloadData.payment_method);
+    setPaymentData(null);
+
+    try {
+      await markPaid(sessionId, payloadData);
+      fetchTables(); // Sync without blocking
     } catch (error) {
       console.error('Error marking as paid:', error);
+      fetchTables(); // Reset on error
     }
   };
 
