@@ -1,0 +1,90 @@
+.profit-table-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.025);
+  border: 1px solid #f1f5f9;
+  margin-top: 32px;
+}
+
+.profit-table-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 20px 0;
+  letter-spacing: -0.01em;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.profit-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.profit-table th,
+.profit-table td {
+  padding: 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.profit-table th {
+  background-color: #f8fafc;
+  font-size: 13px;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.profit-table th:first-child {
+  border-top-left-radius: 8px;
+}
+
+.profit-table th:last-child {
+  border-top-right-radius: 8px;
+}
+
+.profit-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.profit-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.profit-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.profit-table td {
+  font-size: 14px;
+  color: #1e293b;
+}
+
+.align-right {
+  text-align: right;
+}
+
+.font-medium {
+  font-weight: 600;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.text-expense {
+  color: #64748b;
+}
+
+.text-profit {
+  color: #10b981;
+}
+
+.text-loss {
+  color: #ef4444;
+}

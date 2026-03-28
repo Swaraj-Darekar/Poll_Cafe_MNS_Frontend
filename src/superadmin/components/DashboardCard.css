@@ -1,0 +1,98 @@
+.sa-card {
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.02);
+  position: relative;
+  overflow: hidden;
+}
+
+.sa-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+}
+
+.sa-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sa-card-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  font-size: 24px;
+}
+
+.sa-card-trend {
+  font-size: 13px;
+  font-weight: 600;
+  background-color: rgba(0, 0, 0, 0.02);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.sa-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sa-card-title {
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.sa-card-value {
+  color: #1e293b;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+/* Wallet Card Specific Styles */
+.wallet-card {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: white;
+}
+
+.wallet-card .sa-card-icon {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+}
+
+.wallet-card .sa-card-title {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.wallet-card .sa-card-value {
+  color: white;
+  font-size: 32px;
+}
+
+.sa-add-money-btn {
+  margin-top: 12px;
+  background-color: white;
+  color: #6366f1;
+  border: none;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.sa-add-money-btn:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+  transform: scale(1.02);
+}

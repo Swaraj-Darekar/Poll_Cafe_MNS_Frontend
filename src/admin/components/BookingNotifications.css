@@ -1,0 +1,205 @@
+.bn-container {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 300px;
+  width: 100%;
+  pointer-events: none;
+}
+
+.bn-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(12px);
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  pointer-events: auto;
+}
+
+.bn-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bn-mute-btn {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bn-mute-btn:hover { background: rgba(255,255,255,0.1); }
+
+.bn-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.25);
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(16,185,129,0.25); }
+  50% { box-shadow: 0 0 0 6px rgba(16,185,129,0.1); }
+}
+
+.bn-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #10b981;
+  letter-spacing: 0.04em;
+}
+
+.bn-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-height: 400px;
+  overflow-y: auto;
+  pointer-events: auto;
+}
+
+.bn-list::-webkit-scrollbar { width: 4px; }
+.bn-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+
+.bn-card {
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(16,185,129,0.2);
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  animation: slideInLeft 0.35s ease;
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-40px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.bn-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.bn-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.bn-paid-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #10b981;
+  background: rgba(16,185,129,0.12);
+  border: 1px solid rgba(16,185,129,0.25);
+  padding: 0.2rem 0.6rem;
+  border-radius: 50px;
+}
+
+.bn-phone,
+.bn-time,
+.bn-table-type {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  margin-bottom: 0.3rem;
+}
+
+.bn-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 0.8rem;
+}
+
+.bn-approve-btn,
+.bn-reject-btn {
+  flex: 1;
+  padding: 0.55rem;
+  border-radius: 10px;
+  border: none;
+  font-weight: 700;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.bn-approve-btn {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+}
+
+.bn-reject-btn {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.bn-approve-btn:hover:not(:disabled),
+.bn-reject-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.bn-reject-btn:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.bn-approve-btn:disabled,
+.bn-reject-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Audio Helper Alert */
+.bn-audio-helper {
+  background: #f59e0b;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 8px;
+  pointer-events: auto;
+  animation: bounce 2s infinite;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-6px); }
+  60% { transform: translateY(-3px); }
+}
+
+.bn-mute-btn.is-muted {
+  background: rgba(239, 68, 68, 0.15);
+  animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+

@@ -1,0 +1,176 @@
+.table-card {
+  transition: var(--transition);
+  position: relative;
+  height: 100%;
+}
+
+.table-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(16, 185, 129, 0.3);
+  box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.6);
+}
+
+.table-card.reserved {
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.table-img-container {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+}
+
+.table-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.table-card:hover .table-img {
+  transform: scale(1.1);
+}
+
+.table-img-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, var(--dark), transparent);
+  opacity: 0.8;
+}
+
+.price-tag {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background-color: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  padding: 0.4rem 1rem;
+  border-radius: 50px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: 1px solid var(--glass-border);
+}
+
+.table-details {
+  padding: 1.5rem;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.table-name {
+  font-size: 1.35rem;
+  margin-bottom: 0.25rem;
+}
+
+.table-type {
+  font-size: 0.9rem;
+  color: var(--gray-300);
+}
+
+.table-status {
+  padding: 0.4rem 0.85rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table-status.available {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--primary);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.table-status.reserved {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--accent);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.table-status.unavailable {
+  background-color: rgba(71, 85, 105, 0.1);
+  color: var(--gray-400);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.table-action-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.table-meta {
+  font-size: 0.8rem;
+  color: var(--gray-500);
+}
+
+.table-btn {
+  padding: 0.65rem 1.25rem;
+  font-size: 0.875rem;
+}
+
+.table-btn.disabled {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--gray-600);
+  cursor: not-allowed;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Occupied table styles */
+.table-card.occupied-card {
+  border-color: rgba(239, 68, 68, 0.2);
+  opacity: 0.85;
+}
+
+.table-card.occupied-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.occupied-overlay {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  background: rgba(239, 68, 68, 0.85);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 50px;
+  letter-spacing: 0.5px;
+}
+
+.table-status.unavailable {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.table-meta {
+  font-size: 0.8rem;
+  color: var(--gray-300);
+  max-width: 120px;
+  font-style: italic;
+}
+
+.btn-occupied {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  cursor: not-allowed;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.875rem;
+  border-radius: 10px;
+}

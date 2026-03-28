@@ -1,0 +1,162 @@
+.sa-dashboard {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.sa-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 40px;
+}
+
+.sa-page-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.sa-page-subtitle {
+  color: #64748b;
+  margin: 4px 0 0 0;
+  font-size: 16px;
+}
+
+.sa-header-date {
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  background-color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.sa-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+/* Specific grid layout for stats with wallet card being larger */
+@media (min-width: 1200px) {
+  .sa-stats-grid {
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
+  }
+}
+
+.sa-content-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 1200px) {
+  .sa-content-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.sa-overview-card {
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.02);
+}
+
+.sa-overview-card.mini {
+  display: flex;
+  flex-direction: column;
+}
+
+.sa-overview-card .sa-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.sa-overview-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.sa-view-all {
+  background: none;
+  border: none;
+  color: #6366f1;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.sa-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+  color: #94a3b8;
+}
+
+.sa-empty-icon {
+  font-size: 40px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.sa-quick-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sa-quick-link {
+  padding: 14px 20px;
+  background-color: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  color: #475569;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sa-quick-link:hover {
+  background-color: #f1f5f9;
+  color: #1e293b;
+  transform: translateX(4px);
+}
+
+@media (max-width: 1024px) {
+  .sa-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .sa-stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .sa-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

@@ -1,0 +1,97 @@
+.search-section {
+  padding: 100px 0;
+  background-color: var(--dark);
+}
+
+.search-card {
+  padding: 3rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.search-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #ffffff !important;
+  padding-left: 0.25rem;
+  letter-spacing: 0.02em;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 1.25rem;
+  color: var(--primary);
+  pointer-events: none;
+}
+
+.form-select {
+  width: 100%;
+  background-color: rgba(15, 23, 42, 0.4);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1.125rem 1.25rem 1.125rem 3.5rem;
+  color: var(--white);
+  font-size: 1rem;
+  appearance: none;
+  cursor: pointer;
+  transition: var(--transition);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.3)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1.25rem center;
+  background-size: 1.25rem;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  background-color: rgba(15, 23, 42, 0.6);
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+}
+
+.form-select option {
+  background-color: var(--dark);
+  color: var(--white);
+}
+
+.search-footer {
+  display: flex;
+  justify-content: center;
+}
+
+.search-btn {
+  padding: 1.125rem 3rem;
+  font-size: 1.125rem;
+}
+
+@media (max-width: 900px) {
+  .search-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .search-card {
+    padding: 1.5rem;
+  }
+}

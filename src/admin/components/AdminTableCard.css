@@ -1,0 +1,180 @@
+.admin-table-card {
+  background-color: #ffffff;
+  border-radius: 28px;
+  padding: 40px 24px;
+  border: 4px solid #dbeafe; /* Light blue border from screenshot */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 320px;
+  text-align: center;
+  box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.admin-table-card.running {
+  background-color: #f7fffa;
+  border-color: #10b981; /* Green border for active session */
+}
+
+
+.table-header-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: auto;
+}
+
+.table-title {
+  font-size: 26px;
+  font-weight: 900;
+  color: #1e293b;
+  margin: 0;
+  letter-spacing: -0.03em;
+}
+
+.table-type {
+  font-size: 13px;
+  font-weight: 800;
+  color: #4f46e5;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.timer-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 28px 0;
+}
+
+.timer-display {
+  font-size: 32px;
+  font-weight: 800;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #064e3b;
+  margin: 0 0 10px 0;
+  letter-spacing: -0.02em;
+}
+
+.customer-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: #065f46;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.customer-phone {
+  font-size: 12px;
+  font-weight: 700;
+  color: #065f46;
+  letter-spacing: 0.02em;
+  margin: 6px 0 0 0;
+}
+
+.card-active-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  flex: 1;
+}
+
+.btn-end-pill {
+  width: 100%;
+  background-color: #10b981;
+  color: #ffffff;
+  border: none;
+  padding: 16px;
+  border-radius: 16px;
+  font-weight: 800;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+  margin-top: auto;
+}
+
+.btn-end-pill:hover {
+  background-color: #059669;
+  transform: translateY(-1px);
+}
+
+.idle-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: auto 0;
+  cursor: pointer;
+  flex: 1;
+  width: 100%;
+}
+
+.btn-add-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  background-color: #f5f3ff;
+  color: #4f46e5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 400;
+  border: 4px solid #eef2ff;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.idle-section:hover .btn-add-circle {
+  background-color: #ede9fe;
+  transform: scale(1.05);
+}
+
+.start-text {
+  font-size: 14px;
+  font-weight: 800;
+  color: #4f46e5;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+
+/* Booking Warnings */
+.admin-table-card.warning-booking {
+  background-color: #fff9db; /* Subtle yellow */
+  border-color: #fcc419; /* Yellow border */
+}
+
+.admin-table-card.warning-booking .table-type {
+  color: #e67700;
+}
+
+.admin-table-card.blocked-booking .idle-section {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.booking-alert-text {
+  font-size: 10px;
+  font-weight: 800;
+  color: #e67700;
+  margin-top: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.blocked-booking .start-text {
+  color: #94a3b8;
+}
+.blocked-booking .btn-add-circle {
+  background-color: #f1f5f9;
+  color: #94a3b8;
+}
+
