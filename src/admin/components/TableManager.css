@@ -13,8 +13,9 @@
 
 .tables-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 32px;
+  /* Use a smaller minmax value to guarantee 3 columns fit within 10-inch tablet dimensions */
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
 }
 
 /* Modal Styles */
@@ -126,7 +127,7 @@
 }
 
 /* Responsive */
-@media (max-width: 1024px) {
+@media (max-width: 900px) {
   .tables-grid {
     grid-template-columns: repeat(2, 1fr);
   }

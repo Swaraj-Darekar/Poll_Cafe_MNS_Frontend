@@ -3,7 +3,13 @@
   height: 100vh;
   overflow: hidden;
   background-color: #f0f2f5;
+  color: #1e293b; /* Set default text to dark for admin pages */
 }
+
+.admin-layout .section-title {
+  color: #0f172a !important; /* Override the white !important from index.css */
+}
+
 
 .admin-main {
   flex: 1;
