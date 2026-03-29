@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Topbar from './components/Topbar';
 import BookingNotifications from './components/BookingNotifications';
-import { getAnalytics, getSuperAdminStats } from '../api';
+import { getAnalytics, getSuperAdminStats, getExpenses, addExpense, deleteExpense } from '../api';
 import './AdminLayout.css';
 
 const AdminLayout = () => {
@@ -22,10 +22,10 @@ const AdminLayout = () => {
   const fetchAnalytics = async () => {
     try {
       const data = await getAnalytics();
-      if (data) {
+      if (data && data.today) {
         setSalesData({
           todaySales: data.today.revenue,
-          monthlySales: data.cycle.revenue,
+          monthlySales: data.cycle?.revenue || 0,
           totalBookings: data.today.bookings,
           todayCash: data.today.cash_total || 0,
           todayOnline: data.today.online_total || 0
@@ -57,9 +57,24 @@ const AdminLayout = () => {
     }
   };
 
+  const fetchExpenses = async () => {
+    try {
+      const data = await getExpenses();
+      if (Array.isArray(data)) {
+        setExpenses(data);
+      } else {
+        console.warn("fetchExpenses returned non-array:", data);
+        setExpenses([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch expenses:", error);
+    }
+  };
+
   useEffect(() => {
     fetchAnalytics();
     fetchWallet();
+    fetchExpenses();
     // Poll stats more frequently (30s)
     const interval = setInterval(() => {
       fetchAnalytics();
@@ -68,12 +83,31 @@ const AdminLayout = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleAddExpense = (newExpense) => {
-    setExpenses(prev => [...prev, newExpense]);
+  const handleAddExpense = async (newExpense) => {
+    try {
+      // Optimistically we could add it, but here we await DB ID
+      const savedExpense = await addExpense({
+        name: newExpense.name,
+        amount: newExpense.amount,
+        date: newExpense.date
+      });
+      if (savedExpense && savedExpense.id) {
+        setExpenses(prev => [...prev, savedExpense]);
+      }
+    } catch (e) {
+      console.error("Could not add expense", e);
+      alert("Failed to save expense.");
+    }
   };
 
-  const handleDeleteExpense = (id) => {
-    setExpenses(prev => prev.filter(exp => exp.id !== id));
+  const handleDeleteExpense = async (id) => {
+    try {
+      await deleteExpense(id);
+      setExpenses(prev => prev.filter(exp => exp.id !== id));
+    } catch (e) {
+      console.error("Could not delete expense", e);
+      alert("Failed to delete expense.");
+    }
   };
 
   const handleResetExpenses = () => {
@@ -123,7 +157,8 @@ const AdminLayout = () => {
             fetchAnalytics,
             walletBalance,
             isWalletBlocked,
-            fetchWallet
+            fetchWallet,
+            fetchExpenses
           }} />
         </div>
       </div>

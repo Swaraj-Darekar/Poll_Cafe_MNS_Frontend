@@ -5,7 +5,7 @@ import { settleMonth, getSettlements } from '../../api';
 import './Analytics.css';
 
 const Analytics = () => {
-  const { expenses, salesData, fetchAnalytics, handleResetExpenses } = useOutletContext();
+  const { expenses, salesData, fetchAnalytics, handleResetExpenses, fetchExpenses } = useOutletContext();
   const [settlements, setSettlements] = useState([]);
   
   const { thisMonthSales, todaysSales, totalBookings } = {
@@ -18,7 +18,12 @@ const Analytics = () => {
   const fetchSettlementsHistory = async () => {
     try {
       const data = await getSettlements();
-      if (data) setSettlements(data);
+      if (Array.isArray(data)) {
+        setSettlements(data);
+      } else {
+        console.warn("fetchSettlementsHistory returned non-array:", data);
+        setSettlements([]);
+      }
     } catch (error) {
       console.error("Failed to fetch settlements:", error);
     }
@@ -30,7 +35,8 @@ const Analytics = () => {
 
   // Derived Calculations
   const totalMonthlyExpense = useMemo(() => {
-    return expenses.reduce((sum, exp) => sum + exp.amount, 0);
+    const validExpenses = Array.isArray(expenses) ? expenses : [];
+    return validExpenses.reduce((sum, exp) => sum + exp.amount, 0);
   }, [expenses]);
 
   const netProfit = thisMonthSales - totalMonthlyExpense;
@@ -53,7 +59,8 @@ const Analytics = () => {
         handleResetExpenses(); // Clear current expenses
         await Promise.all([
           fetchAnalytics(), // Reset dashboard sales/bookings
-          fetchSettlementsHistory() // Update history list
+          fetchSettlementsHistory(), // Update history list
+          fetchExpenses() // Hook into latest settlement cut-off boundary
         ]);
       } else {
         alert("Settlement failed: " + (response.detail || "Unknown error"));
@@ -65,7 +72,8 @@ const Analytics = () => {
   };
 
   // Formatting for the Table (Historical Settlements Only)
-  const tableData = settlements.map(s => ({
+  const validSettlements = Array.isArray(settlements) ? settlements : [];
+  const tableData = validSettlements.map(s => ({
     month: `${s.month} ${s.year}`,
     sales: s.total_revenue,
     expense: s.total_expense,
@@ -113,7 +121,7 @@ const Analytics = () => {
           <div className="analytics-info">
             <p className="analytics-label">This Month Expense</p>
             <h3 className="analytics-amount">₹{totalMonthlyExpense.toLocaleString()}</h3>
-            <p className="analytics-detail">{expenses.length} Records</p>
+            <p className="analytics-detail">{(Array.isArray(expenses) ? expenses : []).length} Records</p>
           </div>
         </div>
 

@@ -1,4 +1,5 @@
-const API_BASE_URL = 'https://poll-cafe-mns-backend.onrender.com';
+const API_BASE_URL = 'http://localhost:8000';
+// const API_BASE_URL = 'https://poll-cafe-mns-backend.onrender.com';
 
 export const testBackendConnection = async () => {
     try {
@@ -87,6 +88,43 @@ export const markPaid = async (sessionId, billingData) => {
         body: JSON.stringify(billingData)
     });
     return await response.json();
+};
+
+// Expenses
+export const getExpenses = async () => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/expenses/`);
+        return await response.json();
+    } catch (error) {
+        console.error("Error fetching expenses:", error);
+        return [];
+    }
+};
+
+export const addExpense = async (expenseData) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/expenses/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(expenseData)
+        });
+        return await response.json();
+    } catch (error) {
+        console.error("Error adding expense:", error);
+        throw error;
+    }
+};
+
+export const deleteExpense = async (expenseId) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/expenses/${expenseId}`, {
+            method: 'DELETE'
+        });
+        return await response.json();
+    } catch (error) {
+        console.error("Error deleting expense:", error);
+        throw error;
+    }
 };
 
 export const getAnalytics = async () => {
@@ -313,5 +351,8 @@ export default {
     resetSuperAdminSystem,
     addWalletMoney,
     getBookingStatus,
-    getAllBookings
+    getAllBookings,
+    getExpenses,
+    addExpense,
+    deleteExpense
 };
