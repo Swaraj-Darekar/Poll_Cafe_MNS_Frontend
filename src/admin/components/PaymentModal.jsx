@@ -69,7 +69,7 @@ const PaymentModal = ({ isOpen, table, duration, totalAmount, grossAmount, advan
               </div>
               {safeCommission > 0 && (
                 <div className="bill-item" style={{ color: '#fbbf24' }}>
-                  <span>Platform Commission</span>
+                  <span>Platform Fees</span>
                   <span className="value">+₹{safeCommission.toLocaleString()}</span>
                 </div>
               )}
