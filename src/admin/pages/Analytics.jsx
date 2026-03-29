@@ -120,7 +120,7 @@ const Analytics = () => {
           <div className="analytics-icon">📉</div>
           <div className="analytics-info">
             <p className="analytics-label">This Month Expense</p>
-            <h3 className="analytics-amount">₹{totalMonthlyExpense.toLocaleString()}</h3>
+            <h3 className="analytics-amount" style={{ color: '#ef4444' }}>₹{totalMonthlyExpense.toLocaleString()}</h3>
             <p className="analytics-detail">{(Array.isArray(expenses) ? expenses : []).length} Records</p>
           </div>
         </div>
