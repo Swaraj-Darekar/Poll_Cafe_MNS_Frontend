@@ -17,6 +17,9 @@ const Dashboard = () => {
       setLoading(true);
       const data = await getSuperAdminStats();
       if (data) {
+        if (data.error) {
+          console.error("Backend returned stats error:", data.error);
+        }
         setStats(data);
       }
     } catch (error) {
@@ -90,7 +93,7 @@ const Dashboard = () => {
   const dashboardStats = [
     {
       title: "Today's Bookings",
-      value: stats?.today_bookings || "0",
+      value: stats?.error ? "Error" : (stats?.today_bookings || "0"),
       icon: <Calendar size={24} />,
       trend: stats?.today_bookings > 0 ? "+New" : "0",
       color: "#3b82f6"
@@ -139,12 +142,18 @@ const Dashboard = () => {
       <div className="sa-stats-grid">
         <DashboardCard 
           title="Wallet Balance"
-          value={`₹${(stats?.wallet_balance || 0).toLocaleString()}`}
+          value={stats?.error ? "₹ Error" : `₹${(stats?.wallet_balance || 0).toLocaleString()}`}
           icon={<Wallet size={24} />}
           color="#6366f1"
           isWallet={true}
           onAddMoney={() => setIsModalOpen(true)}
         />
+        
+        {stats?.error && (
+          <div className="sa-error-banner">
+            ⚠️ <strong>Data Mismatch Warning:</strong> Backend reported an error: {stats.error}. Please check database connection.
+          </div>
+        )}
         
         {dashboardStats.map((stat, index) => (
           <DashboardCard key={index} {...stat} />
