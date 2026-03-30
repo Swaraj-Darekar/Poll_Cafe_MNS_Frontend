@@ -2,7 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { useOutletContext, useSearchParams } from 'react-router-dom';
 import AdminTableCard from './AdminTableCard';
 import PaymentModal from './PaymentModal';
-import { getTables, startSession, getActiveSessions, endSession, markPaid, getSettings, getBookingByPhone, getUpcomingBookingsPerTable } from '../../api';
+import { 
+  getTables, 
+  startSession, 
+  getActiveSessions, 
+  endSession, 
+  markPaid, 
+  getSettings, 
+  getBookingByPhone, 
+  getUpcomingBookingsPerTable,
+  getMenu,
+  recordTakeawaySale
+} from '../../api';
+import { getTableOrders, addOrderItem, removeOrderItem, clearTableOrders } from '../../utils/menuUtils';
 import './TableManager.css';
 
 const TableManager = ({ onUpdateStats }) => {
@@ -28,15 +40,24 @@ const TableManager = ({ onUpdateStats }) => {
   const [isStarting, setIsStarting] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
 
+  // Order Management State
+  const [tableOrders, setTableOrders] = useState({});
+  const [isOrderMenuOpen, setIsOrderMenuOpen] = useState(false);
+  const [isViewActiveOrderOpen, setIsViewActiveOrderOpen] = useState(false);
+  const [activeOrderTable, setActiveOrderTable] = useState(null);
+  const [menuItems, setMenuItems] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+
   // Fetch tables and active sessions from backend
   const fetchTables = async () => {
     try {
       console.log('DEBUG: Fetching tables and active sessions...');
-      const [tablesData, activeSessionsData, settingsData, upcomingBookings] = await Promise.all([
+      const [tablesData, activeSessionsData, settingsData, upcomingBookings, menuData] = await Promise.all([
         getTables(),
         getActiveSessions(),
         getSettings(),
-        getUpcomingBookingsPerTable()
+        getUpcomingBookingsPerTable(),
+        getMenu()
       ]);
 
       console.log('DEBUG: Tables Data Received:', tablesData);
@@ -44,6 +65,10 @@ const TableManager = ({ onUpdateStats }) => {
 
       if (settingsData) {
         setSettings(settingsData);
+      }
+
+      if (menuData) {
+        setMenuItems(menuData);
       }
 
       const activeSessionsMap = activeSessionsData.reduce((acc, cur) => {
@@ -63,10 +88,18 @@ const TableManager = ({ onUpdateStats }) => {
 
         const isRunning = activeSession ? true : t.status === 'occupied';
 
+        let tableName = `Table ${t.table_number}`;
+        if (t.type === 'big') tableName = `Big Table ${t.table_number}`;
+        if (t.type === 'sd' || t.table_number == 5) tableName = "SD Gaming Table";
+
+        let tableRate = t.type === 'big' ? settings.big_price_per_hour : settings.small_price_per_hour;
+        if (t.type === 'sd' || t.table_number == 5) tableRate = settings.sd_price_per_hour || 200;
+
         return {
           ...t,
           id: t.id,
-          name: t.type === 'big' ? `Big Table ${t.table_number}` : `Table ${t.table_number}`,
+          name: tableName,
+          rate: tableRate || (t.type === 'big' ? 150 : 100),
           isRunning: isRunning,
           startTime: activeSession ? new Date(activeSession.start_time).getTime() : null,
           customerName: activeSession ? activeSession.customer_name : '',
@@ -84,6 +117,7 @@ const TableManager = ({ onUpdateStats }) => {
 
   useEffect(() => {
     fetchTables();
+    setTableOrders(getTableOrders());
   }, []);
 
   // Handle auto-search from query param
@@ -231,6 +265,35 @@ const TableManager = ({ onUpdateStats }) => {
     }
   };
 
+  const handleAddItemClick = (table) => {
+    setActiveOrderTable(table);
+    setIsOrderMenuOpen(true);
+  };
+
+  const handleViewOrderClick = (table) => {
+    setActiveOrderTable(table);
+    setIsViewActiveOrderOpen(true);
+  };
+
+  const handleAddMenuToTable = (item) => {
+    if (!activeOrderTable) return;
+    const updatedOrders = addOrderItem(activeOrderTable.id, item);
+    setTableOrders({ ...tableOrders, [activeOrderTable.id]: updatedOrders });
+    // alert(`${item.name} added to ${activeOrderTable.name}`);
+  };
+
+  const handleRemoveOrderItem = (orderSnapshotId) => {
+    if (!activeOrderTable) return;
+    const updatedOrders = removeOrderItem(activeOrderTable.id, orderSnapshotId);
+    setTableOrders({ ...tableOrders, [activeOrderTable.id]: updatedOrders });
+  };
+
+  const getItemQuantity = (itemId) => {
+    if (!activeOrderTable) return 0;
+    const currentOrders = tableOrders[activeOrderTable.id] || [];
+    return currentOrders.filter(i => i.id === itemId).length;
+  };
+
   const handleEndTable = async (table) => {
     let sessionId = table.sessionId || activeSessions[table.id] || localStorage.getItem(`session_${table.id}`);
     if (!sessionId) {
@@ -241,17 +304,21 @@ const TableManager = ({ onUpdateStats }) => {
     try {
       const response = await endSession(sessionId, true);
       if (response && !response.error && !response.detail) {
+        const currentOrders = tableOrders[table.id] || [];
+        const orderTotal = currentOrders.reduce((sum, item) => sum + item.price, 0);
+        
         setPaymentData({
           table,
           sessionId: sessionId,
           duration: response.total_seconds || (response.total_minutes * 60),
           durationMinutes: response.total_minutes || Math.floor(response.total_seconds / 60),
-          totalAmount: response.total_amount,
-          grossAmount: response.gross_amount,
+          totalAmount: response.total_amount + orderTotal,
+          grossAmount: response.gross_amount + orderTotal,
           advanceAmount: response.advance_amount,
           commissionAmount: response.commission_amount,
           upiId: response.upi_id || settings.upi_id,
-          rate: response.rate
+          rate: response.rate,
+          orderItems: currentOrders // Pass order items to PaymentModal
         });
         setIsPaymentModalOpen(true);
       } else {
@@ -280,6 +347,26 @@ const TableManager = ({ onUpdateStats }) => {
     // Close modal and update UI instantly (Optimistic UI)
     setIsPaymentModalOpen(false);
     
+    // For Take Away, we just clear the orders and update sales stats
+    if (tableId === 'takeaway') {
+      handleAddSale(amount, payloadData.payment_method);
+      setPaymentData(null);
+      clearTableOrders('takeaway');
+      setTableOrders(getTableOrders());
+      // Persist to backend so analytics picks it up
+      try {
+        const result = await recordTakeawaySale(amount, payloadData.payment_method);
+        if (!result || result.detail) {
+          console.error('Takeaway sale backend record failed:', result);
+        } else {
+          console.log('Takeaway sale recorded in backend:', result);
+        }
+      } catch (err) {
+        console.error('Error recording takeaway sale to backend:', err);
+      }
+      return; 
+    }
+
     localStorage.removeItem(`session_${tableId}`);
     setActiveSessions(prev => {
       const newState = { ...prev };
@@ -297,6 +384,8 @@ const TableManager = ({ onUpdateStats }) => {
     
     handleAddSale(amount, payloadData.payment_method);
     setPaymentData(null);
+    clearTableOrders(tableId); // Important: Clear orders after payment
+    setTableOrders(getTableOrders()); // Refresh state
 
     try {
       await markPaid(sessionId, payloadData);
@@ -305,6 +394,36 @@ const TableManager = ({ onUpdateStats }) => {
       console.error('Error marking as paid:', error);
       fetchTables(); // Reset on error
     }
+  };
+
+  // ── Take Away Specific Handlers ──
+  const handleTakeAwayClick = () => {
+    setActiveOrderTable({ id: 'takeaway', name: 'Take Away' });
+    setIsOrderMenuOpen(true);
+  };
+
+  const handleTakeAwayCheckout = () => {
+    const currentOrders = tableOrders['takeaway'] || [];
+    if (currentOrders.length === 0) {
+      alert("No items added to Take Away yet.");
+      return;
+    }
+    const orderTotal = currentOrders.reduce((sum, item) => sum + item.price, 0);
+    
+    setPaymentData({
+      table: { id: 'takeaway', name: 'Take Away', type: 'takeaway' },
+      sessionId: `takeaway_${Date.now()}`,
+      duration: 0,
+      durationMinutes: 0,
+      totalAmount: orderTotal,
+      grossAmount: orderTotal,
+      advanceAmount: 0,
+      commissionAmount: 0,
+      upiId: settings.upi_id,
+      rate: 0,
+      orderItems: currentOrders 
+    });
+    setIsPaymentModalOpen(true);
   };
 
   return (
@@ -330,18 +449,50 @@ const TableManager = ({ onUpdateStats }) => {
       </div>
       <div className="tables-grid">
         {tables.map(table => {
-          const tableRate = table.type === 'big' ? settings.big_price_per_hour : settings.small_price_per_hour;
+          let tableRate = table.type === 'big' ? settings.big_price_per_hour : settings.small_price_per_hour;
+          if (table.type === 'sd' || table.table_number == 5) tableRate = settings.sd_price_per_hour || 200;
+          
           return (
             <AdminTableCard
               key={table.id}
               table={table}
               rate={tableRate || (table.type === 'big' ? 150 : 100)}
+              orders={tableOrders[table.id] || []}
               onStart={handleStartClick}
               onEnd={handleEndTable}
+              onAddItem={handleAddItemClick}
+              onViewOrder={handleViewOrderClick}
               isWalletBlocked={isWalletBlocked}
             />
           );
         })}
+
+        {/* ── Take Away Card (Moved to end) ── */}
+        <div className={`admin-table-card takeaway-card ${tableOrders['takeaway']?.length > 0 ? 'running' : 'available'}`}>
+          <div className="table-header-center">
+            <h3 className="table-title">Take Away</h3>
+            <span className="table-type">CAFÉ ORDERS</span>
+          </div>
+          {tableOrders['takeaway']?.length > 0 ? (
+            <div className="card-active-content">
+              <div className="timer-section">
+                <div className="order-count-badge">{tableOrders['takeaway'].length} Items</div>
+                <p className="customer-name">Active Take-Away</p>
+                <p className="order-total-preview">₹{tableOrders['takeaway'].reduce((sum, i) => sum + i.price, 0)}</p>
+              </div>
+              <div className="table-actions-row">
+                <button className="action-btn-circle add-item-btn" onClick={handleTakeAwayClick} title="Add Item">+</button>
+                <button className="btn-end-pill checkout-takeaway-btn" onClick={handleTakeAwayCheckout}>CHECKOUT</button>
+                <button className="action-btn-circle view-order-btn" onClick={() => handleViewOrderClick({ id: 'takeaway', name: 'Take Away' })} title="View Order">👁</button>
+              </div>
+            </div>
+          ) : (
+            <div className="idle-section" onClick={handleTakeAwayClick}>
+              <button className="btn-add-circle">+</button>
+              <span className="start-text">ADD ORDER</span>
+            </div>
+          )}
+        </div>
       </div>
 
       <PaymentModal
@@ -354,9 +505,120 @@ const TableManager = ({ onUpdateStats }) => {
         commissionAmount={paymentData?.commissionAmount}
         upiId={paymentData?.upiId}
         rate={paymentData?.rate}
+        orderItems={paymentData?.orderItems}
         onPaid={handleMarkAsPaid}
         onClose={() => setIsPaymentModalOpen(false)}
       />
+
+      {/* ── Order Selection Modal (Menu) ── */}
+      {isOrderMenuOpen && (
+        <div className="admin-modal-overlay">
+          <div className="admin-modal order-menu-modal">
+            <div className="modal-header">
+              <h3>Order for {activeOrderTable?.name}</h3>
+              <button className="close-btn" onClick={() => { setIsOrderMenuOpen(false); setSearchTerm(''); }}>&times;</button>
+            </div>
+            <div className="menu-search-container">
+              <span className="search-icon-fixed">🔍</span>
+              <input
+                type="text"
+                placeholder="Search menu items..."
+                className="menu-search-input"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              {searchTerm && (
+                <button 
+                  className="clear-search-btn" 
+                  onClick={() => setSearchTerm('')}
+                  title="Clear search"
+                >
+                  &times;
+                </button>
+              )}
+            </div>
+            <div className="menu-grid-container">
+              <div className="menu-items-grid">
+                {menuItems
+                  .filter(item => (item.name || '').toLowerCase().includes((searchTerm || '').toLowerCase()))
+                  .map(item => {
+                    const quantity = getItemQuantity(item.id);
+                    return (
+                      <div 
+                        key={item.id} 
+                        className={`menu-order-card ${quantity > 0 ? 'menu-order-card--selected' : ''}`} 
+                        onClick={() => handleAddMenuToTable(item)}
+                      >
+                        <div className="menu-card-info">
+                          <span className="menu-card-name">{item.name}</span>
+                          <span className="menu-card-price">₹{item.price}</span>
+                        </div>
+                        <div className="menu-card-action">
+                          {quantity > 0 && <span className="item-qty-badge">x{quantity}</span>}
+                          <button className="add-plus-btn">+</button>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+            <div className="modal-actions menu-modal-footer">
+              <button className="btn btn-outline-dark" onClick={() => setIsViewActiveOrderOpen(true)}>View Order</button>
+              <button 
+                className="btn btn-primary" 
+                onClick={() => { 
+                  setIsOrderMenuOpen(false); 
+                  setSearchTerm(''); 
+                  // If it's a takeaway, automatically open the bill after clicking Done
+                  if (activeOrderTable?.id === 'takeaway') {
+                    handleTakeAwayCheckout();
+                  }
+                }}
+              >
+                {activeOrderTable?.id === 'takeaway' ? 'Finish & Bill' : 'Done'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── View Active Order Modal ── */}
+      {isViewActiveOrderOpen && (
+        <div className="admin-modal-overlay">
+          <div className="admin-modal active-order-modal">
+            <div className="modal-header">
+              <h3>Orders - {activeOrderTable?.name}</h3>
+              <button className="close-btn" onClick={() => setIsViewActiveOrderOpen(false)}>&times;</button>
+            </div>
+            <div className="order-list-container">
+              {tableOrders[activeOrderTable?.id]?.length > 0 ? (
+                <ul className="active-order-list">
+                  {tableOrders[activeOrderTable.id].map(item => (
+                    <li key={item.orderSnapshotId} className="active-order-item">
+                      <span className="item-name">{item.name}</span>
+                      <div className="item-right">
+                        <span className="item-price">₹{item.price}</span>
+                        <button className="remove-btn" onClick={() => handleRemoveOrderItem(item.orderSnapshotId)}>&times;</button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="empty-order-msg">No items ordered yet.</div>
+              )}
+            </div>
+            {tableOrders[activeOrderTable?.id]?.length > 0 && (
+              <div className="order-summary-footer">
+                <span>Total:</span>
+                <strong>₹{tableOrders[activeOrderTable.id].reduce((sum, i) => sum + i.price, 0)}</strong>
+              </div>
+            )}
+            <div className="modal-actions" style={{ marginTop: '16px' }}>
+              <button className="btn btn-outline-dark" onClick={() => setIsViewActiveOrderOpen(false)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Original Start Table Modal (Name → Phone) ── */}
       {isModalOpen && (

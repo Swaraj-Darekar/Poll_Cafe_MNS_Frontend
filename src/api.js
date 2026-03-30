@@ -126,7 +126,72 @@ export const deleteExpense = async (expenseId) => {
     }
 };
 
-export const getAnalytics = async () => {
+ 
+ // Menu Management
+ export const getMenu = async () => {
+     try {
+         const response = await fetch(`${API_BASE_URL}/menu/`);
+         return await response.json();
+     } catch (error) {
+         console.error("Error fetching menu:", error);
+         return [];
+     }
+ };
+
+ export const recordTakeawaySale = async (totalAmount, paymentMethod) => {
+     try {
+         const response = await fetch(`${API_BASE_URL}/takeaway/pay`, {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ total_amount: totalAmount, payment_method: paymentMethod })
+         });
+         return await response.json();
+     } catch (error) {
+         console.error("Error recording takeaway sale:", error);
+     }
+ };
+ 
+ export const addMenuItem = async (itemData) => {
+     try {
+         const response = await fetch(`${API_BASE_URL}/menu/`, {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify(itemData)
+         });
+         return await response.json();
+     } catch (error) {
+         console.error("Error adding menu item:", error);
+         throw error;
+     }
+ };
+ 
+ export const updateMenuItem = async (itemId, itemData) => {
+     try {
+         const response = await fetch(`${API_BASE_URL}/menu/${itemId}`, {
+             method: 'PUT',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify(itemData)
+         });
+         return await response.json();
+     } catch (error) {
+         console.error("Error updating menu item:", error);
+         throw error;
+     }
+ };
+ 
+ export const deleteMenuItem = async (itemId) => {
+     try {
+         const response = await fetch(`${API_BASE_URL}/menu/${itemId}`, {
+             method: 'DELETE'
+         });
+         return await response.json();
+     } catch (error) {
+         console.error("Error deleting menu item:", error);
+         throw error;
+     }
+ };
+ 
+ export const getAnalytics = async () => {
     const response = await fetch(`${API_BASE_URL}/analytics/`);
     return await response.json();
 };
@@ -353,5 +418,9 @@ export default {
     getAllBookings,
     getExpenses,
     addExpense,
-    deleteExpense
+    deleteExpense,
+    getMenu,
+    addMenuItem,
+    updateMenuItem,
+    deleteMenuItem
 };

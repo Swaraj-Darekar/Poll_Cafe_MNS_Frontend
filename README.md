@@ -68,9 +68,10 @@ Once both terminals are running without errors, open your web browser:
 ---
 
 ## ⚡ Key Features
-- **Real-time Table Tracking**: precise timers and status updates.
+- **Café Inventory & Takeaway**: Manage a digital menu and process quick takeaway sales.
+- **Real-time Table Tracking**: Precise timers and status updates for pool table sessions.
 - **Wallet-Based Billing**: Automated commission deduction on session payments.
-- **Low-Balance Alerts**: Critical banners and system blocks when wallet balance is low (≤ ₹10).
+- **Low-Balance Alerts**: Critical banners and system blocks when wallet balance is low (≤ ₹5).
 - **Advance Bookings**: Visual indicators (slight yellow) 30 mins before advanced reservations.
 - **Global Reset**: Secure system-wide data clearing for a fresh start.
 
@@ -83,6 +84,7 @@ Ensure your Supabase database has the following tables:
 - `bookings`
 - `settings`
 - `expenses`
+- `menu` (Required for café orders)
 - `wallet_transactions`
 - `superadmin_settlements`
 

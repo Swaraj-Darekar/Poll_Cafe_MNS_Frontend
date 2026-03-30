@@ -111,6 +111,10 @@ body {
 .section-title {
   font-size: 2.25rem;
   margin-bottom: 1rem;
+}
+
+/* White section titles only on the public-facing pages */
+.public-page .section-title {
   color: #ffffff !important;
 }
 

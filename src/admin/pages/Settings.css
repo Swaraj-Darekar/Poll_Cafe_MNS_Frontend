@@ -268,3 +268,232 @@
   }
 }
 
+/* Modal Styles for Menu Management */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeInModal 0.2s ease-out;
+  padding: 40px 20px; /* Added space outside the card for better view */
+  box-sizing: border-box;
+}
+
+.modal-content {
+  background: white;
+  padding: 32px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 450px;
+  max-height: calc(100vh - 80px); /* Ensure it doesn't touch top/bottom */
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Prevent vertical overflow of card itself */
+}
+
+.menu-list-modal {
+  max-width: 600px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.modal-header h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #64748b;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+
+.menu-table-container {
+  max-height: 500px;
+  overflow-y: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.menu-search-container {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.menu-search-input {
+  width: 100%;
+  padding: 12px 54px 12px 60px; /* Further increased padding for a breathable look */
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.menu-search-input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.search-icon-fixed {
+  position: absolute;
+  left: 26px; /* Moved significantly deeper inside the box */
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 14px;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 22px; /* Moved significantly deeper inside the box */
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: #f1f5f9;
+  color: #64748b;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  transition: all 0.2s;
+  z-index: 5;
+}
+
+.clear-search-btn:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.clear-search-btn:active {
+  transform: translateY(-50%) scale(0.9);
+}
+
+.menu-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.menu-table th {
+  background-color: #f8fafc;
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #475569;
+  border-bottom: 2px solid #f1f5f9;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.menu-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+  vertical-align: middle;
+}
+
+.category-tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #64748b;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+.category-tag.drinks { background: #e0f2fe; color: #0369a1; }
+.category-tag.snacks { background: #fef3c7; color: #92400e; }
+
+.edit-input-small {
+  width: 80px;
+  padding: 6px 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+}
+
+.edit-input-small:focus {
+  border-color: #4f46e5;
+}
+
+.menu-action-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  background: none;
+  border: 1px solid #e2e8f0;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+}
+
+.action-btn.edit:hover {
+  background-color: #f0fdf4;
+  border-color: #22c55e;
+  color: #16a34a;
+}
+
+.action-btn.delete:hover {
+  background-color: #fef2f2;
+  border-color: #ef4444;
+  color: #dc2626;
+}
+
+.action-btn.save {
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+}
+
+.action-btn.save:hover {
+  background-color: #4338ca;
+}
+
+@keyframes fadeInModal {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './AdminTableCard.css';
 
-const AdminTableCard = ({ table, rate, onStart, onEnd, isWalletBlocked }) => {
+const AdminTableCard = ({ table, rate, orders = [], onStart, onEnd, onAddItem, onViewOrder, isWalletBlocked }) => {
   const [elapsed, setElapsed] = useState(0);
   const [currentTime, setCurrentTime] = useState(Date.now());
 
@@ -84,6 +84,7 @@ const AdminTableCard = ({ table, rate, onStart, onEnd, isWalletBlocked }) => {
       <div className="table-header-center">
         <h3 className="table-title">{table.name}</h3>
         <span className="table-type">{table.type === 'big' ? 'BIG TABLE' : 'SMALL TABLE'}</span>
+        {rate && <span className="table-rate">₹{rate}/hr</span>}
       </div>
 
       {(table.isRunning || table.sessionId) ? (
@@ -93,9 +94,21 @@ const AdminTableCard = ({ table, rate, onStart, onEnd, isWalletBlocked }) => {
             <p className="customer-name">{table.customerName || 'Guest'}</p>
             {table.customerPhone && <p className="customer-phone">{table.customerPhone}</p>}
           </div>
-          <button className="btn-end-pill" onClick={() => onEnd(table)}>
-            END TABLE
-          </button>
+
+          <div className="table-actions-row">
+            <button className="action-btn-circle add-item-btn" onClick={() => onAddItem(table)} title="Add Item">
+              +
+            </button>
+            <button className="btn-end-pill" onClick={() => onEnd(table)}>
+              END TABLE
+            </button>
+            <button className="action-btn-circle view-order-btn" onClick={() => onViewOrder(table)} title="View Order" style={{ position: 'relative' }}>
+              👁
+              {orders.length > 0 && (
+                <span className="order-count-bubble">{orders.length}</span>
+              )}
+            </button>
+          </div>
         </div>
       ) : (
         <div className="idle-section" onClick={handleStart}>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import './PaymentModal.css';
 
-const PaymentModal = ({ isOpen, table, duration, totalAmount, grossAmount, advanceAmount, commissionAmount, upiId: manualUpiId, rate, onPaid, onClose }) => {
+const PaymentModal = ({ isOpen, table, duration, totalAmount, grossAmount, advanceAmount, commissionAmount, upiId: manualUpiId, rate, orderItems = [], onPaid, onClose }) => {
   const [paymentMethod, setPaymentMethod] = useState('online');
   const [cashReceived, setCashReceived] = useState('');
 
@@ -32,58 +32,79 @@ const PaymentModal = ({ isOpen, table, duration, totalAmount, grossAmount, advan
     <div className="payment-modal-overlay">
       <div className="payment-modal">
         <div className="modal-header">
-          <h3>Checkout - {table.name}</h3>
+          <h3>{table.type === 'takeaway' ? 'Take Away Bill' : `Checkout - ${table.name}`}</h3>
           <button className="close-btn" onClick={onClose}>&times;</button>
         </div>
 
         <div className="payment-content">
           {/* Left Side: Bill Details */}
           <div className="bill-details">
-            <h4 className="section-subtitle-modal">Billing Details</h4>
-            <div className="bill-item">
-              <span>Table Type</span>
-              <span className="value">{table.type === 'big' ? 'Big Table' : 'Small Table'}</span>
-            </div>
-            <div className="bill-item">
-              <span>Customer Name</span>
-              <span className="value">{table.customerName || 'Guest'}</span>
-            </div>
-            <div className="bill-item">
-              <span>Phone Number</span>
-              <span className="value">{table.customerPhone || 'N/A'}</span>
-            </div>
-            <div className="bill-item">
-              <span>Duration</span>
-              <span className="value">{formatTime(safeDuration)}</span>
-            </div>
-            <div className="bill-item">
-              <span>Rate</span>
-              <span className="value">₹{rate || (table.type === 'big' ? '150' : '100')}/hr</span>
+            <div className="bill-scroll-content">
+              <h4 className="section-subtitle-modal">Billing Details</h4>
+              <div className="bill-item">
+                <span>Table Type</span>
+                <span className="value">{table.type === 'big' ? 'Big Table' : 'Small Table'}</span>
+              </div>
+              <div className="bill-item">
+                <span>Customer Name</span>
+                <span className="value">{table.customerName || 'Guest'}</span>
+              </div>
+              <div className="bill-item">
+                <span>Phone Number</span>
+                <span className="value">{table.customerPhone || 'N/A'}</span>
+              </div>
+              {table.type !== 'takeaway' && (
+                <>
+                  <div className="bill-item">
+                    <span>Duration</span>
+                    <span className="value">{formatTime(safeDuration)}</span>
+                  </div>
+                  <div className="bill-item">
+                    <span>Time Charge ({rate || (table.type === 'big' ? '150' : '100')}/hr)</span>
+                    <span className="value">₹{(safeGross - (orderItems?.reduce((sum, i) => sum + i.price, 0) || 0)).toLocaleString()}</span>
+                  </div>
+                </>
+              )}
+
+              {/* Extra Orders Section */}
+              {orderItems && orderItems.length > 0 && (
+                <div style={{ marginTop: '1rem', borderTop: '1px solid rgba(0,0,0,0.07)', paddingTop: '1rem' }}>
+                  <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cafe Orders</span>
+                  {orderItems.map((item, idx) => (
+                    <div key={idx} className="bill-item" style={{ marginTop: '4px' }}>
+                      <span style={{ fontSize: '0.875rem', color: '#475569' }}>• {item.name}</span>
+                      <span className="value">₹{item.price.toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
             </div>
 
-            {/* Advance Deduction Display */}
-            <div style={{ marginTop: '1.5rem', borderTop: '1px dashed rgba(255,255,255,0.1)', paddingTop: '1rem' }}>
-              <div className="bill-item">
-                <span>Total Bill</span>
-                <span className="value">₹{safeGross.toLocaleString()}</span>
+            <div className="bill-summary-card">
+              <div className="summary-line subtotal">
+                <span>Subtotal</span>
+                <span className="amount">₹{safeGross.toLocaleString()}</span>
               </div>
               {safeCommission > 0 && (
-                <div className="bill-item" style={{ color: '#fbbf24' }}>
+                <div className="summary-line commission">
                   <span>Platform Fees</span>
-                  <span className="value">+₹{safeCommission.toLocaleString()}</span>
+                  <span className="amount">+₹{safeCommission.toLocaleString()}</span>
                 </div>
               )}
               {safeAdvance > 0 && (
-                <div className="bill-item" style={{ color: '#10b981' }}>
-                  <span>Advance Booking Payment</span>
-                  <span className="value">-₹{safeAdvance.toLocaleString()}</span>
+                <div className="summary-line advance">
+                  <span>Advance Payment</span>
+                  <span className="amount">-₹{safeAdvance.toLocaleString()}</span>
                 </div>
               )}
-            </div>
+              
+              <div className="summary-divider"></div>
 
-            <div className="bill-total">
-              <span>Final Payable</span>
-              <span className="amount">₹{safeTotal.toLocaleString()}</span>
+              <div className="total-row">
+                <span className="label">Total</span>
+                <span className="amount">₹{safeTotal.toLocaleString()}</span>
+              </div>
             </div>
           </div>
 
@@ -150,7 +171,7 @@ const PaymentModal = ({ isOpen, table, duration, totalAmount, grossAmount, advan
         <div className="modal-footer">
           <button className="btn-cancel" onClick={onClose}>Cancel</button>
           <button className="btn-mark-paid" onClick={() => onPaid(paymentMethod)}>
-            Mark as Paid & Reset Table
+            {table.type === 'takeaway' ? 'Mark as Paid & Complete' : 'Mark as Paid & Reset Table'}
           </button>
         </div>
       </div>
