@@ -330,32 +330,36 @@ const TableManager = ({ onUpdateStats }) => {
     }
   };
 
-  const handleMarkAsPaid = async (paymentMethod) => {
+  const handleMarkAsPaid = async (paymentMethod, discountedAmount, discountApplied) => {
     if (!paymentData) return;
     
     const tableId = paymentData.table.id;
-    const amount = paymentData.totalAmount;
+    // Use the discounted amount passed from PaymentModal, otherwise fallback to the original total
+    const finalAmount = discountedAmount !== undefined ? discountedAmount : paymentData.totalAmount;
     const sessionId = paymentData.sessionId;
     const payloadData = {
-        total_amount: amount,
+        total_amount: finalAmount,
         gross_amount: paymentData.grossAmount,
         commission_amount: paymentData.commissionAmount,
+        discount_amount: discountApplied || 0, // Track discount in backend payload if supported
         duration_minutes: paymentData.durationMinutes,
         payment_method: paymentMethod || 'online'
     };
+
 
     // Close modal and update UI instantly (Optimistic UI)
     setIsPaymentModalOpen(false);
     
     // For Take Away, we just clear the orders and update sales stats
     if (tableId === 'takeaway') {
-      handleAddSale(amount, payloadData.payment_method);
+      handleAddSale(finalAmount, payloadData.payment_method);
       setPaymentData(null);
       clearTableOrders('takeaway');
       setTableOrders(getTableOrders());
       // Persist to backend so analytics picks it up
       try {
-        const result = await recordTakeawaySale(amount, payloadData.payment_method);
+        const result = await recordTakeawaySale(finalAmount, payloadData.payment_method);
+
         if (!result || result.detail) {
           console.error('Takeaway sale backend record failed:', result);
         } else {
@@ -382,10 +386,11 @@ const TableManager = ({ onUpdateStats }) => {
         sessionId: null 
     } : t));
     
-    handleAddSale(amount, payloadData.payment_method);
+    handleAddSale(finalAmount, payloadData.payment_method);
     setPaymentData(null);
     clearTableOrders(tableId); // Important: Clear orders after payment
     setTableOrders(getTableOrders()); // Refresh state
+
 
     try {
       await markPaid(sessionId, payloadData);

@@ -1,7 +1,7 @@
 import React from 'react';
 import './ProfitTable.css';
 
-const ProfitTable = ({ data = [] }) => {
+const ProfitTable = ({ data = [], onExpenseClick }) => {
 
 
   return (
@@ -22,7 +22,12 @@ const ProfitTable = ({ data = [] }) => {
               <tr key={index}>
                 <td className="font-medium">{row.month}</td>
                 <td className="align-right">₹{row.sales.toLocaleString()}</td>
-                <td className="align-right text-expense">₹{row.expense.toLocaleString()}</td>
+                <td 
+                  className="align-right text-expense clickable-expense" 
+                  onClick={() => onExpenseClick && onExpenseClick(row)}
+                >
+                  ₹{row.expense.toLocaleString()}
+                </td>
                 <td className={`align-right font-bold ${row.profit >= 0 ? 'text-profit' : 'text-loss'}`}>
                   {row.profit >= 0 ? '+' : '-'}₹{Math.abs(row.profit).toLocaleString()}
                 </td>

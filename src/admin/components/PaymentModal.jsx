@@ -3,8 +3,21 @@ import { QRCodeSVG } from 'qrcode.react';
 import './PaymentModal.css';
 
 const PaymentModal = ({ isOpen, table, duration, totalAmount, grossAmount, advanceAmount, commissionAmount, upiId: manualUpiId, rate, orderItems = [], onPaid, onClose }) => {
+  const [discountAmount, setDiscountAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('online');
   const [cashReceived, setCashReceived] = useState('');
+  const [showDiscountInput, setShowDiscountInput] = useState(false);
+
+  // Reset local state whenever the modal opens to a fresh bill
+  React.useEffect(() => {
+    if (isOpen) {
+      setDiscountAmount('');
+      setCashReceived('');
+      setShowDiscountInput(false);
+      setPaymentMethod('online');
+    }
+  }, [isOpen]);
+
 
   if (!isOpen || !table) return null;
 
@@ -15,10 +28,14 @@ const PaymentModal = ({ isOpen, table, duration, totalAmount, grossAmount, advan
   const safeDuration = parseFloat(duration || 0);
 
   const parsedCash = parseFloat(cashReceived || 0);
-  const returnAmount = parsedCash > safeTotal ? parsedCash - safeTotal : 0;
+  const parsedDiscount = parseFloat(discountAmount || 0);
+  const finalTotal = Math.max(0, safeTotal - parsedDiscount);
+
+  const returnAmount = parsedCash > finalTotal ? parsedCash - finalTotal : 0;
 
   const upiId = manualUpiId || "example@upi"; 
-  const upiUrl = `upi://pay?pa=${upiId}&pn=Pool%20Cafe&am=${safeTotal.toFixed(2)}&cu=INR`;
+  const upiUrl = `upi://pay?pa=${upiId}&pn=Pool%20Cafe&am=${finalTotal.toFixed(2)}&cu=INR`;
+
 
   const formatTime = (totalSeconds) => {
     const s = Math.floor(totalSeconds);
@@ -98,13 +115,49 @@ const PaymentModal = ({ isOpen, table, duration, totalAmount, grossAmount, advan
                   <span className="amount">-₹{safeAdvance.toLocaleString()}</span>
                 </div>
               )}
+
+              {parsedDiscount > 0 && (
+                <div className="summary-line discount">
+                  <span>Discount</span>
+                  <span className="amount">-₹{parsedDiscount.toLocaleString()}</span>
+                </div>
+              )}
               
               <div className="summary-divider"></div>
 
               <div className="total-row">
                 <span className="label">Total</span>
-                <span className="amount">₹{safeTotal.toLocaleString()}</span>
+                <span className="amount">₹{finalTotal.toLocaleString()}</span>
               </div>
+
+              <div style={{ marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {!showDiscountInput ? (
+                  <button 
+                    className="btn-discount-toggle"
+                    onClick={() => setShowDiscountInput(true)}
+                  >
+                    % Apply Discount
+                  </button>
+                ) : (
+                  <div className="discount-input-wrapper">
+                    <input 
+                      type="number" 
+                      className="discount-input"
+                      placeholder="Enter amount"
+                      value={discountAmount}
+                      onChange={(e) => setDiscountAmount(e.target.value)}
+                      autoFocus
+                    />
+                    <button 
+                      className="btn-discount-apply"
+                      onClick={() => setShowDiscountInput(false)}
+                    >
+                      Done
+                    </button>
+                  </div>
+                )}
+              </div>
+
             </div>
           </div>
 
@@ -161,7 +214,8 @@ const PaymentModal = ({ isOpen, table, duration, totalAmount, grossAmount, advan
                 <div className="qr-container">
                   <QRCodeSVG value={upiUrl} size={180} />
                 </div>
-                <div className="amount-badge">₹{safeTotal.toLocaleString()}</div>
+                <div className="amount-badge">₹{finalTotal.toLocaleString()}</div>
+
                 <p className="upi-id">{upiId}</p>
               </>
             )}
@@ -170,7 +224,7 @@ const PaymentModal = ({ isOpen, table, duration, totalAmount, grossAmount, advan
 
         <div className="modal-footer">
           <button className="btn-cancel" onClick={onClose}>Cancel</button>
-          <button className="btn-mark-paid" onClick={() => onPaid(paymentMethod)}>
+          <button className="btn-mark-paid" onClick={() => onPaid(paymentMethod, finalTotal, parsedDiscount)}>
             {table.type === 'takeaway' ? 'Mark as Paid & Complete' : 'Mark as Paid & Reset Table'}
           </button>
         </div>

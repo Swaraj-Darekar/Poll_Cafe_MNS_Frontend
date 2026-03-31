@@ -81,6 +81,19 @@
   color: #64748b;
 }
 
+.text-expense.clickable-expense {
+  cursor: pointer;
+  text-decoration: underline dashed 1px;
+  text-underline-offset: 4px;
+  transition: all 0.2s ease;
+}
+
+.text-expense.clickable-expense:hover {
+  color: #0f172a;
+  background-color: #f1f5f9;
+  border-radius: 4px;
+}
+
 .text-profit {
   color: #10b981;
 }

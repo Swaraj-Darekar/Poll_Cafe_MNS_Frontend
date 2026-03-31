@@ -16,7 +16,11 @@ const AdminLayout = () => {
     monthlySales: 0,
     totalBookings: 0,
     todayCash: 0,
-    todayOnline: 0
+    todayOnline: 0,
+    yesterdaySales: 0,
+    yesterdayBookings: 0,
+    yesterdayCash: 0,
+    yesterdayOnline: 0
   });
 
   const fetchAnalytics = async () => {
@@ -28,7 +32,11 @@ const AdminLayout = () => {
           monthlySales: data.cycle?.revenue || 0,
           totalBookings: data.today.bookings,
           todayCash: data.today.cash_total || 0,
-          todayOnline: data.today.online_total || 0
+          todayOnline: data.today.online_total || 0,
+          yesterdaySales: data.yesterday?.revenue || 0,
+          yesterdayBookings: data.yesterday?.bookings || 0,
+          yesterdayCash: data.yesterday?.cash_total || 0,
+          yesterdayOnline: data.yesterday?.online_total || 0
         });
       }
     } catch (error) {

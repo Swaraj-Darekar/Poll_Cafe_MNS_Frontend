@@ -90,7 +90,22 @@ export const markPaid = async (sessionId, billingData) => {
 };
 
 // Expenses
+export const getExpensesInRange = async (startDate, endDate) => {
+    try {
+        const start = encodeURIComponent(startDate);
+        const end = encodeURIComponent(endDate);
+        const response = await fetch(`${API_BASE_URL}/expenses/history?start_date=${start}&end_date=${end}`);
+        return await response.json();
+    } catch (error) {
+        console.error("Error fetching historical expenses:", error);
+        return [];
+    }
+};
+
+
+
 export const getExpenses = async () => {
+
     try {
         const response = await fetch(`${API_BASE_URL}/expenses/`);
         return await response.json();
@@ -417,9 +432,11 @@ export default {
     getBookingStatus,
     getAllBookings,
     getExpenses,
+    getExpensesInRange,
     addExpense,
     deleteExpense,
     getMenu,
+
     addMenuItem,
     updateMenuItem,
     deleteMenuItem
