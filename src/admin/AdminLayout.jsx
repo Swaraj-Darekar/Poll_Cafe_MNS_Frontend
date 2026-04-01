@@ -15,10 +15,12 @@ const AdminLayout = () => {
     todaySales: 0,
     monthlySales: 0,
     totalBookings: 0,
+    todayTakeaways: 0,
     todayCash: 0,
     todayOnline: 0,
     yesterdaySales: 0,
     yesterdayBookings: 0,
+    yesterdayTakeaways: 0,
     yesterdayCash: 0,
     yesterdayOnline: 0
   });
@@ -31,10 +33,12 @@ const AdminLayout = () => {
           todaySales: data.today.revenue,
           monthlySales: data.cycle?.revenue || 0,
           totalBookings: data.today.bookings,
+          todayTakeaways: data.today.takeaways || 0,
           todayCash: data.today.cash_total || 0,
           todayOnline: data.today.online_total || 0,
           yesterdaySales: data.yesterday?.revenue || 0,
           yesterdayBookings: data.yesterday?.bookings || 0,
+          yesterdayTakeaways: data.yesterday?.takeaways || 0,
           yesterdayCash: data.yesterday?.cash_total || 0,
           yesterdayOnline: data.yesterday?.online_total || 0
         });
@@ -122,12 +126,13 @@ const AdminLayout = () => {
     setExpenses([]);
   };
 
-  const handleAddSale = (amount, paymentMethod) => {
+  const handleAddSale = (amount, paymentMethod, isTakeaway = false) => {
     setSalesData(prev => ({
       ...prev,
       todaySales: prev.todaySales + amount,
       monthlySales: prev.monthlySales + amount,
-      totalBookings: prev.totalBookings + 1,
+      totalBookings: isTakeaway ? prev.totalBookings : prev.totalBookings + 1,
+      todayTakeaways: isTakeaway ? prev.todayTakeaways + 1 : prev.todayTakeaways,
       todayCash: paymentMethod === 'cash' ? prev.todayCash + amount : prev.todayCash,
       todayOnline: paymentMethod !== 'cash' ? prev.todayOnline + amount : prev.todayOnline
     }));

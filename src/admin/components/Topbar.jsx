@@ -5,13 +5,17 @@ import './Topbar.css';
 const pageTitles = {
   '/admin': 'Dashboard',
   '/admin/analytics': 'Analytics',
+  '/admin/history': 'History',
+  '/admin/expenses': 'Expenses',
   '/admin/settings': 'Settings',
+  '/admin/bookings': 'Bookings',
 };
 
 const Topbar = () => {
   const { userRole } = useAuth();
   const location = useLocation();
-  const title = pageTitles[location.pathname] || 'Dashboard';
+  const currentPath = location.pathname;
+  const title = pageTitles[currentPath] || 'Dashboard';
 
   return (
     <header className="admin-topbar">

@@ -41,6 +41,16 @@ const Sidebar = () => {
         </NavLink>
 
         <NavLink
+          to="/admin/history"
+          className={({ isActive }) =>
+            `sidebar-link${isActive ? ' active' : ''}`
+          }
+        >
+          <span className="sidebar-icon">🕒</span>
+          <span>History</span>
+        </NavLink>
+
+        <NavLink
           to="/admin/analytics"
           className={({ isActive }) =>
             `sidebar-link${isActive ? ' active' : ''}`

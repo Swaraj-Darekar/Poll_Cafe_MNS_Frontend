@@ -17,6 +17,7 @@ import Analytics from './admin/pages/Analytics';
 import Expenses from './admin/pages/Expenses';
 import Bookings from './admin/pages/Bookings';
 import Settings from './admin/pages/Settings';
+import History from './admin/pages/History';
 import './index.css';
 
 // Super Admin Components
@@ -54,10 +55,18 @@ const PublicLayout = () => {
     </div>
   );
 };
-
 function App() {
   useEffect(() => {
-    testBackendConnection();
+    // Eagerly ping the backend to "wake it up" from cold starts (Render/Vercel free tier)
+    const wakeup = async () => {
+      try {
+        await testBackendConnection();
+        console.log('Backend warmed up successfully');
+      } catch (e) {
+        console.error('Backend warm-up failed', e);
+      }
+    };
+    wakeup();
   }, []);
 
   return (
@@ -74,6 +83,7 @@ function App() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="analytics" element={<SectionGuard section="analytics"><Analytics /></SectionGuard>} />
+            <Route path="history" element={<History />} />
             <Route path="expenses" element={<SectionGuard section="expenses"><Expenses /></SectionGuard>} />
             <Route path="bookings" element={<Bookings />} />
             <Route path="settings" element={<SectionGuard section="settings"><Settings /></SectionGuard>} />

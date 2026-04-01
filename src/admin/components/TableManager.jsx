@@ -352,7 +352,7 @@ const TableManager = ({ onUpdateStats }) => {
     
     // For Take Away, we just clear the orders and update sales stats
     if (tableId === 'takeaway') {
-      handleAddSale(finalAmount, payloadData.payment_method);
+      handleAddSale(finalAmount, payloadData.payment_method, true);
       setPaymentData(null);
       clearTableOrders('takeaway');
       setTableOrders(getTableOrders());

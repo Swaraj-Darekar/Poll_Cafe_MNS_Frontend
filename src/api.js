@@ -1,15 +1,25 @@
 const API_BASE_URL = 'https://poll-cafe-mns-backend.onrender.com';
 
+export const healthCheck = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/health`);
+    return await response.json();
+  } catch (error) {
+    console.error('Health Check Error:', error);
+    return null;
+  }
+};
+
 export const testBackendConnection = async () => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/`);
-        const data = await response.json();
-        console.log('Backend Connection:', data);
-        return data;
-    } catch (error) {
-        console.error('Backend Connection Error:', error);
-        return null;
-    }
+  try {
+    const response = await fetch(`${API_BASE_URL}/`);
+    const data = await response.json();
+    console.log('Backend Connection:', data);
+    return data;
+  } catch (error) {
+    console.error('Backend Connection Error:', error);
+    return null;
+  }
 };
 
 // Settings cache
@@ -17,222 +27,232 @@ let cachedSettings = null;
 let lastSettingsFetch = 0;
 
 export const getSettings = async () => {
-    const now = Date.now();
-    if (cachedSettings && (now - lastSettingsFetch < 60000)) {
-        return cachedSettings;
-    }
-    const response = await fetch(`${API_BASE_URL}/settings/`);
-    cachedSettings = await response.json();
-    lastSettingsFetch = now;
+  const now = Date.now();
+  if (cachedSettings && (now - lastSettingsFetch < 60000)) {
     return cachedSettings;
+  }
+  const response = await fetch(`${API_BASE_URL}/settings/`);
+  cachedSettings = await response.json();
+  lastSettingsFetch = now;
+  return cachedSettings;
 };
 
 export const updateSettings = async (settings) => {
-    const response = await fetch(`${API_BASE_URL}/settings/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(settings)
-    });
-    return await response.json();
+  const response = await fetch(`${API_BASE_URL}/settings/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(settings)
+  });
+  return await response.json();
 };
 
 // Tables
 export const getTables = async () => {
-    const response = await fetch(`${API_BASE_URL}/tables/`);
-    return await response.json();
+  const response = await fetch(`${API_BASE_URL}/tables/`);
+  return await response.json();
 };
 
 export const updateTableStatus = async (tableId, status) => {
-    const response = await fetch(`${API_BASE_URL}/tables/${tableId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status })
-    });
-    return await response.json();
+  const response = await fetch(`${API_BASE_URL}/tables/${tableId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status })
+  });
+  return await response.json();
 };
 
 // Sessions
 export const startSession = async (tableId, name, phone, bookingId = null) => {
-    const response = await fetch(`${API_BASE_URL}/start-table`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-            table_id: tableId, 
-            customer_name: name, 
-            customer_phone: phone,
-            booking_id: bookingId
-        })
-    });
-    return await response.json();
+  const response = await fetch(`${API_BASE_URL}/start-table`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      table_id: tableId,
+      customer_name: name,
+      customer_phone: phone,
+      booking_id: bookingId
+    })
+  });
+  return await response.json();
 };
 
 export const getActiveSessions = async () => {
-    const response = await fetch(`${API_BASE_URL}/active-sessions`);
-    return await response.json();
+  const response = await fetch(`${API_BASE_URL}/active-sessions`);
+  return await response.json();
 };
 
 export const endSession = async (sessionId, isPreview = false) => {
-    const response = await fetch(`${API_BASE_URL}/end-table`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session_id: sessionId, is_preview: isPreview })
-    });
-    return await response.json();
+  const response = await fetch(`${API_BASE_URL}/end-table`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ session_id: sessionId, is_preview: isPreview })
+  });
+  return await response.json();
 };
 
 export const markPaid = async (sessionId, billingData) => {
-    const response = await fetch(`${API_BASE_URL}/${sessionId}/pay`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(billingData)
-    });
-    return await response.json();
+  const response = await fetch(`${API_BASE_URL}/${sessionId}/pay`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(billingData)
+  });
+  return await response.json();
 };
 
 // Expenses
 export const getExpensesInRange = async (startDate, endDate) => {
-    try {
-        const start = encodeURIComponent(startDate);
-        const end = encodeURIComponent(endDate);
-        const response = await fetch(`${API_BASE_URL}/expenses/history?start_date=${start}&end_date=${end}`);
-        return await response.json();
-    } catch (error) {
-        console.error("Error fetching historical expenses:", error);
-        return [];
-    }
+  try {
+    const start = encodeURIComponent(startDate);
+    const end = encodeURIComponent(endDate);
+    const response = await fetch(`${API_BASE_URL}/expenses/history?start_date=${start}&end_date=${end}`);
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching historical expenses:", error);
+    return [];
+  }
 };
 
 
 
 export const getExpenses = async () => {
 
-    try {
-        const response = await fetch(`${API_BASE_URL}/expenses/`);
-        return await response.json();
-    } catch (error) {
-        console.error("Error fetching expenses:", error);
-        return [];
-    }
+  try {
+    const response = await fetch(`${API_BASE_URL}/expenses/`);
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching expenses:", error);
+    return [];
+  }
 };
 
 export const addExpense = async (expenseData) => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/expenses/`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(expenseData)
-        });
-        return await response.json();
-    } catch (error) {
-        console.error("Error adding expense:", error);
-        throw error;
-    }
+  try {
+    const response = await fetch(`${API_BASE_URL}/expenses/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(expenseData)
+    });
+    return await response.json();
+  } catch (error) {
+    console.error("Error adding expense:", error);
+    throw error;
+  }
 };
 
 export const deleteExpense = async (expenseId) => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/expenses/${expenseId}`, {
-            method: 'DELETE'
-        });
-        return await response.json();
-    } catch (error) {
-        console.error("Error deleting expense:", error);
-        throw error;
-    }
+  try {
+    const response = await fetch(`${API_BASE_URL}/expenses/${expenseId}`, {
+      method: 'DELETE'
+    });
+    return await response.json();
+  } catch (error) {
+    console.error("Error deleting expense:", error);
+    throw error;
+  }
 };
 
- 
- // Menu Management
- export const getMenu = async () => {
-     try {
-         const response = await fetch(`${API_BASE_URL}/menu/`);
-         return await response.json();
-     } catch (error) {
-         console.error("Error fetching menu:", error);
-         return [];
-     }
- };
 
- export const recordTakeawaySale = async (totalAmount, paymentMethod) => {
-     try {
-         const response = await fetch(`${API_BASE_URL}/takeaway/pay`, {
-             method: 'POST',
-             headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify({ total_amount: totalAmount, payment_method: paymentMethod })
-         });
-         return await response.json();
-     } catch (error) {
-         console.error("Error recording takeaway sale:", error);
-     }
- };
- 
- export const addMenuItem = async (itemData) => {
-     try {
-         const response = await fetch(`${API_BASE_URL}/menu/`, {
-             method: 'POST',
-             headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify(itemData)
-         });
-         return await response.json();
-     } catch (error) {
-         console.error("Error adding menu item:", error);
-         throw error;
-     }
- };
- 
- export const updateMenuItem = async (itemId, itemData) => {
-     try {
-         const response = await fetch(`${API_BASE_URL}/menu/${itemId}`, {
-             method: 'PUT',
-             headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify(itemData)
-         });
-         return await response.json();
-     } catch (error) {
-         console.error("Error updating menu item:", error);
-         throw error;
-     }
- };
- 
- export const deleteMenuItem = async (itemId) => {
-     try {
-         const response = await fetch(`${API_BASE_URL}/menu/${itemId}`, {
-             method: 'DELETE'
-         });
-         return await response.json();
-     } catch (error) {
-         console.error("Error deleting menu item:", error);
-         throw error;
-     }
- };
- 
- export const getAnalytics = async () => {
-    const response = await fetch(`${API_BASE_URL}/analytics/`);
+// Menu Management
+export const getMenu = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/menu/`);
     return await response.json();
+  } catch (error) {
+    console.error("Error fetching menu:", error);
+    return [];
+  }
+};
+
+export const recordTakeawaySale = async (totalAmount, paymentMethod) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/takeaway/pay`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ total_amount: totalAmount, payment_method: paymentMethod })
+    });
+    return await response.json();
+  } catch (error) {
+    console.error("Error recording takeaway sale:", error);
+  }
+};
+
+export const addMenuItem = async (itemData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/menu/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(itemData)
+    });
+    return await response.json();
+  } catch (error) {
+    console.error("Error adding menu item:", error);
+    throw error;
+  }
+};
+
+export const updateMenuItem = async (itemId, itemData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/menu/${itemId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(itemData)
+    });
+    return await response.json();
+  } catch (error) {
+    console.error("Error updating menu item:", error);
+    throw error;
+  }
+};
+
+export const deleteMenuItem = async (itemId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/menu/${itemId}`, {
+      method: 'DELETE'
+    });
+    return await response.json();
+  } catch (error) {
+    console.error("Error deleting menu item:", error);
+    throw error;
+  }
+};
+
+export const getAnalytics = async () => {
+  const response = await fetch(`${API_BASE_URL}/analytics/`);
+  return await response.json();
+};
+
+export const getSessionHistory = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/analytics/history`);
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching session history:", error);
+    return [];
+  }
 };
 
 export const settleMonth = async (month, year, totalExpense) => {
-    const response = await fetch(`${API_BASE_URL}/analytics/settle-month`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ month, year, total_expense: totalExpense })
-    });
-    return await response.json();
+  const response = await fetch(`${API_BASE_URL}/analytics/settle-month`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ month, year, total_expense: totalExpense })
+  });
+  return await response.json();
 };
 
 export const getSettlements = async () => {
-    const response = await fetch(`${API_BASE_URL}/analytics/settlements`);
-    return await response.json();
+  const response = await fetch(`${API_BASE_URL}/analytics/settlements`);
+  return await response.json();
 };
 
 export const getAvailableTables = async () => {
-    const response = await fetch(`${API_BASE_URL}/bookings/available-tables`);
-    return await response.json();
+  const response = await fetch(`${API_BASE_URL}/bookings/available-tables`);
+  return await response.json();
 };
 
 export const getBookingByPhone = async (phone) => {
-    const response = await fetch(`${API_BASE_URL}/bookings/by-phone/${phone}`);
-    return await response.json();
+  const response = await fetch(`${API_BASE_URL}/bookings/by-phone/${phone}`);
+  return await response.json();
 };
 
 export const checkAvailability = async (bookingTime, duration) => {
@@ -250,12 +270,12 @@ export const checkAvailability = async (bookingTime, duration) => {
 };
 
 export const bookTable = async (bookingData) => {
-    const response = await fetch(`${API_BASE_URL}/bookings/book-table`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(bookingData)
-    });
-    return await response.json();
+  const response = await fetch(`${API_BASE_URL}/bookings/book-table`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(bookingData)
+  });
+  return await response.json();
 };
 
 export const getPendingNotifications = async () => {
@@ -377,13 +397,13 @@ export const rejectBooking = async (bookingId) => {
 };
 
 export const clearBookingHistory = async () => {
-    const response = await fetch(`${API_BASE_URL}/bookings/history`, {
-        method: 'DELETE'
-    });
-    if (!response.ok) {
-        throw new Error("Failed to clear booking history");
-    }
-    return await response.json();
+  const response = await fetch(`${API_BASE_URL}/bookings/history`, {
+    method: 'DELETE'
+  });
+  if (!response.ok) {
+    throw new Error("Failed to clear booking history");
+  }
+  return await response.json();
 };
 
 export const getBookingStatus = async (bookingId) => {
@@ -407,37 +427,38 @@ export const getAllBookings = async () => {
 };
 
 export default {
-    testBackendConnection,
-    getSettings,
-    updateSettings,
-    getTables,
-    updateTableStatus,
-    startSession,
-    getActiveSessions,
-    endSession,
-    markPaid,
-    checkAvailability,
-    bookTable,
-    getPendingNotifications,
-    approveBooking,
-    rejectBooking,
-    clearBookingHistory,
-    getUpcomingBookingsPerTable,
-    getSuperAdminStats,
-    updateSuperAdminSettings,
-    settleSuperAdminMonth,
-    getSuperAdminSettlements,
-    resetSuperAdminSystem,
-    addWalletMoney,
-    getBookingStatus,
-    getAllBookings,
-    getExpenses,
-    getExpensesInRange,
-    addExpense,
-    deleteExpense,
-    getMenu,
+  testBackendConnection,
+  getSettings,
+  updateSettings,
+  getTables,
+  updateTableStatus,
+  startSession,
+  getActiveSessions,
+  endSession,
+  markPaid,
+  checkAvailability,
+  bookTable,
+  getPendingNotifications,
+  approveBooking,
+  rejectBooking,
+  clearBookingHistory,
+  getUpcomingBookingsPerTable,
+  getSuperAdminStats,
+  updateSuperAdminSettings,
+  settleSuperAdminMonth,
+  getSuperAdminSettlements,
+  resetSuperAdminSystem,
+  addWalletMoney,
+  getBookingStatus,
+  getAllBookings,
+  getExpenses,
+  getExpensesInRange,
+  addExpense,
+  deleteExpense,
+  getMenu,
 
-    addMenuItem,
-    updateMenuItem,
-    deleteMenuItem
+  addMenuItem,
+  updateMenuItem,
+  deleteMenuItem,
+  healthCheck
 };

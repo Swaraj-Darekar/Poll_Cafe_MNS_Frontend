@@ -1,0 +1,46 @@
+.history-page {
+  padding: 1rem;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.history-header .header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.history-header .section-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0;
+}
+
+.history-header .section-subtitle {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.history-header .header-badge {
+  font-size: 0.75rem;
+  background: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 700;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.history-content {
+  max-width: 900px;
+  margin: 0 auto;
+}
