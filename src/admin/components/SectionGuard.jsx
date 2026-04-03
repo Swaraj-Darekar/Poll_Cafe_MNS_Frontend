@@ -12,7 +12,7 @@ const SectionGuard = ({ children, section }) => {
 
   const handleUnlock = (e) => {
     e.preventDefault();
-    if (password === 'password') {
+    if (password === 'admin123') {
       unlockSection(section);
       setError(false);
     } else {
