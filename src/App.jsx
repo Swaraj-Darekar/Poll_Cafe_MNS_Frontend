@@ -9,6 +9,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import SectionGuard from './admin/components/SectionGuard';
 import { AuthProvider } from './context/AuthContext';
+import ConnectionGuard from './components/ConnectionGuard';
 
 // Admin Components
 import AdminLayout from './admin/AdminLayout';
@@ -55,50 +56,40 @@ const PublicLayout = () => {
     </div>
   );
 };
+
 function App() {
-  useEffect(() => {
-    // Eagerly ping the backend to "wake it up" from cold starts (Render/Vercel free tier)
-    const wakeup = async () => {
-      try {
-        await testBackendConnection();
-        console.log('Backend warmed up successfully');
-      } catch (e) {
-        console.error('Backend warm-up failed', e);
-      }
-    };
-    wakeup();
-  }, []);
-
   return (
-    <AuthProvider>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/*" element={<PublicLayout />} />
+    <ConnectionGuard>
+      <AuthProvider>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/*" element={<PublicLayout />} />
 
-        {/* Auth Route */}
-        <Route path="/login" element={<Login />} />
+          {/* Auth Route */}
+          <Route path="/login" element={<Login />} />
 
-        {/* Admin Routes */}
-        <Route element={<ProtectedRoute allowedRoles={['admin', 'superadmin']} />}>
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="analytics" element={<SectionGuard section="analytics"><Analytics /></SectionGuard>} />
-            <Route path="history" element={<History />} />
-            <Route path="expenses" element={<SectionGuard section="expenses"><Expenses /></SectionGuard>} />
-            <Route path="bookings" element={<Bookings />} />
-            <Route path="settings" element={<SectionGuard section="settings"><Settings /></SectionGuard>} />
+          {/* Admin Routes */}
+          <Route element={<ProtectedRoute allowedRoles={['admin', 'superadmin']} />}>
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="analytics" element={<SectionGuard section="analytics"><Analytics /></SectionGuard>} />
+              <Route path="history" element={<History />} />
+              <Route path="expenses" element={<SectionGuard section="expenses"><Expenses /></SectionGuard>} />
+              <Route path="bookings" element={<Bookings />} />
+              <Route path="settings" element={<SectionGuard section="settings"><Settings /></SectionGuard>} />
+            </Route>
           </Route>
-        </Route>
 
-        {/* Super Admin Routes */}
-        <Route element={<ProtectedRoute allowedRoles={['superadmin']} />}>
-          <Route path="/superadmin" element={<SuperAdminLayout />}>
-            <Route index element={<SADashboard />} />
-            <Route path="settings" element={<SASettings />} />
+          {/* Super Admin Routes */}
+          <Route element={<ProtectedRoute allowedRoles={['superadmin']} />}>
+            <Route path="/superadmin" element={<SuperAdminLayout />}>
+              <Route index element={<SADashboard />} />
+              <Route path="settings" element={<SASettings />} />
+            </Route>
           </Route>
-        </Route>
-      </Routes>
-    </AuthProvider>
+        </Routes>
+      </AuthProvider>
+    </ConnectionGuard>
   );
 }
 

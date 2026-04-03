@@ -1,10 +1,18 @@
 const API_BASE_URL = 'https://poll-cafe-mns-backend.onrender.com';
 
 export const healthCheck = async () => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 sec timeout
+  
   try {
-    const response = await fetch(`${API_BASE_URL}/api/health`);
-    return await response.json();
+    const response = await fetch(`${API_BASE_URL}/api/health`, {
+      signal: controller.signal
+    });
+    const data = await response.json();
+    clearTimeout(timeoutId);
+    return data;
   } catch (error) {
+    clearTimeout(timeoutId);
     console.error('Health Check Error:', error);
     return null;
   }
