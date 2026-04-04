@@ -15,7 +15,7 @@ const History = () => {
           <p className="section-subtitle">Detailed record of all table sessions and takeaways</p>
         </div>
         <div className="header-badge">
-          Since Last Settlement
+          Last 30 Days
         </div>
       </div>
 

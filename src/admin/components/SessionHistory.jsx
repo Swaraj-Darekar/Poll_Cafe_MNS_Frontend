@@ -166,7 +166,7 @@ const SessionHistory = ({ onSettled }) => {
     return (
       <div className="sh-empty-state">
         <div className="sh-empty-icon">📋</div>
-        <p>No sessions recorded since last settlement.</p>
+        <p>No sessions recorded in the last 30 days.</p>
       </div>
     );
   }
