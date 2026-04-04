@@ -26,6 +26,8 @@ const Home = () => {
   // Table & settings state
   const [tables, setTables] = useState([]);
   const [upiId, setUpiId] = useState('yourname@upi');
+  const [merchantName, setMerchantName] = useState('Pool Cafe');
+  const [mcc, setMcc] = useState('0000');
   const [rates, setRates] = useState({ big: 150, small: 100 });
   const [lastUpdated, setLastUpdated] = useState(null);
 
@@ -57,8 +59,9 @@ const Home = () => {
 
   const buildUpiUrl = () => {
     const note = encodeURIComponent(`BOOKING ${name || 'ADV'} ( don't remove this )`);
-    const n = encodeURIComponent('Pool Cafe MNS');
-    return `upi://pay?pa=${upiId}&pn=${n}&am=100&cu=INR&tn=${note}`;
+    const pn = encodeURIComponent(merchantName || 'Pool Cafe');
+    const mc = mcc || '0000';
+    return `upi://pay?pa=${upiId}&pn=${pn}&am=100&cu=INR&tn=${note}&mc=${mc}&mode=02`;
   };
 
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(buildUpiUrl())}`;
@@ -72,6 +75,8 @@ const Home = () => {
       ]);
       if (settingsData) {
         if (settingsData.upi_id) setUpiId(settingsData.upi_id);
+        if (settingsData.merchant_name) setMerchantName(settingsData.merchant_name);
+        if (settingsData.mcc) setMcc(settingsData.mcc);
         const smallPrice = settingsData.small_price_per_hour || settingsData.price_per_hour_small || settingsData.price_per_hour || 100;
         const bigPrice = settingsData.big_price_per_hour || settingsData.price_per_hour_big || 150;
         setRates({ big: bigPrice, small: smallPrice });
@@ -363,7 +368,7 @@ const Home = () => {
                 <div className="bm-pay-grid">
                   <a className="bm-pay-app bm-phonepe"
                     onClick={handleConfirmBooking}
-                    href={`upi://pay?pa=${upiId}&pn=${encodeURIComponent("PoolCafe")}&am=100&cu=INR&tn=${encodeURIComponent("BOOKING " + name + " (don't remove this)")}&tr=${encodeURIComponent("BOOK_" + Date.now())}`}>
+                    href={`upi://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName || "PoolCafe")}&am=100&cu=INR&tn=${encodeURIComponent("BOOKING " + name + " (don't remove this)")}&tr=${encodeURIComponent("BOOK_" + Date.now())}&mc=${mcc || "0000"}&mode=02`}>
                     <svg className="bm-app-logo" viewBox="0 0 48 48" fill="none">
                       <circle cx="24" cy="24" r="24" fill="#5f259f"/>
                       <path d="M33 17.5C33 15 31 13 28.5 13H16v22h5v-8h7.5C31 27 33 25 33 22.5V17.5z" fill="white"/>
@@ -374,7 +379,7 @@ const Home = () => {
 
                   <a className="bm-pay-app bm-gpay"
                     onClick={handleConfirmBooking}
-                    href={`upi://pay?pa=${upiId}&pn=${encodeURIComponent("PoolCafe")}&am=100&cu=INR&tn=${encodeURIComponent("BOOKING " + name + " (don't remove this)")}&tr=${encodeURIComponent("BOOK_" + Date.now())}`}>
+                    href={`upi://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName || "PoolCafe")}&am=100&cu=INR&tn=${encodeURIComponent("BOOKING " + name + " (don't remove this)")}&tr=${encodeURIComponent("BOOK_" + Date.now())}&mc=${mcc || "0000"}&mode=02`}>
                     <svg className="bm-app-logo" viewBox="0 0 40 40">
                       <rect width="40" height="40" rx="8" fill="white"/>
                       <path d="M26.5 20.2c0-.5-.1-1-.2-1.4h-6.1v2.7h3.5c-.2.9-.6 1.6-1.3 2.1v1.7h2.1c1.3-1.2 2-2.9 2-5.1z" fill="#4285F4"/>

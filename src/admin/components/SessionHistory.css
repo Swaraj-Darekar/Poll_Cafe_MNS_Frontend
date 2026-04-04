@@ -239,6 +239,16 @@
   margin-top: -2px;
 }
 
+.sh-extra-tag {
+  font-size: 0.7rem;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-weight: 700;
+  margin-top: -2px;
+}
+
 .sh-amount-final {
   font-size: 0.95rem;
   font-weight: 800;

@@ -14,6 +14,7 @@ const formatDuration = (minutes) => {
 const SessionRow = ({ session }) => {
   const isTakeaway = session.is_takeaway;
   const hasDiscount = session.discount > 0;
+  const hasExtra = session.extra_amount > 0;
   const grossAmount = session.gross_amount || 0;
   const finalTotal = session.total_amount || 0;
 
@@ -45,6 +46,9 @@ const SessionRow = ({ session }) => {
               <span className="sh-gross-strikethru">₹{grossAmount.toLocaleString()}</span>
               <span className="sh-discount-tag">-₹{session.discount}</span>
             </>
+          )}
+          {hasExtra && (
+            <span className="sh-extra-tag">+₹{session.extra_amount}</span>
           )}
           <span className="sh-amount-final">₹{finalTotal.toLocaleString()}</span>
         </div>

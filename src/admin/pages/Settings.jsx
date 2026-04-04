@@ -15,6 +15,8 @@ const Settings = () => {
     big_price_per_hour: '150',
     sd_price_per_hour: '200',
     upi_id: 'example@upi',
+    merchant_name: 'Pool Cafe',
+    mcc: '0000',
     is_commission_enabled: false
   });
   const [commissionAmount, setCommissionAmount] = useState(5);
@@ -48,6 +50,8 @@ const Settings = () => {
             big_price_per_hour: (settingsData.big_price_per_hour || 150).toString(),
             sd_price_per_hour: (settingsData.sd_price_per_hour || 200).toString(),
             upi_id: settingsData.upi_id || 'example@upi',
+            merchant_name: settingsData.merchant_name || 'Pool Cafe',
+            mcc: settingsData.mcc || '0000',
             is_commission_enabled: settingsData.is_commission_enabled || false
           });
           setCommissionAmount(settingsData.commission_per_booking || 5);
@@ -74,6 +78,8 @@ const Settings = () => {
         big_price_per_hour: parseInt(formData.big_price_per_hour),
         sd_price_per_hour: parseInt(formData.sd_price_per_hour),
         upi_id: formData.upi_id,
+        merchant_name: formData.merchant_name,
+        mcc: formData.mcc,
         is_commission_enabled: formData.is_commission_enabled
       });
       setIsSaved(true);
@@ -226,20 +232,54 @@ const Settings = () => {
 
           <div className="settings-card">
             <div className="card-header">
-              <h3>Payment</h3>
-              <span className="card-badge primary">UPI</span>
+              <h3>Payment & UPI</h3>
+              <span className="card-badge primary">Account</span>
             </div>
-            <div className="form-group-settings">
-              <label>Receiver UPI ID</label>
-              <div className="input-outline">
-                <input 
-                  type="text" 
-                  name="upi_id"
-                  value={formData.upi_id}
-                  onChange={handleChange}
-                  placeholder="e.g., username@bank"
-                  required
-                />
+            <div className="payment-fields-group" style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '10px' }}>
+              <div className="form-group-settings">
+                <label>Receiver UPI ID</label>
+                <div className="input-outline">
+                  <input 
+                    type="text" 
+                    name="upi_id"
+                    value={formData.upi_id}
+                    onChange={handleChange}
+                    placeholder="e.g., username@bank"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="form-group-settings">
+                <label>Business / Payee Name</label>
+                <div className="input-outline">
+                  <input 
+                    type="text" 
+                    name="merchant_name"
+                    value={formData.merchant_name}
+                    onChange={handleChange}
+                    placeholder="e.g., Pool Cafe MNS"
+                  />
+                </div>
+                <small style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '4px', display: 'block' }}>
+                  Must match your registered bank name.
+                </small>
+              </div>
+
+              <div className="form-group-settings">
+                <label>Merchant Code (MCC)</label>
+                <div className="input-outline">
+                  <input 
+                    type="text" 
+                    name="mcc"
+                    value={formData.mcc}
+                    onChange={handleChange}
+                    placeholder="e.g., 0000"
+                  />
+                </div>
+                <small style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '4px', display: 'block' }}>
+                  Use <b>0000</b> if unsure. Required for Business accounts.
+                </small>
               </div>
             </div>
           </div>

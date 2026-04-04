@@ -2,18 +2,22 @@ import React, { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import './PaymentModal.css';
 
-const PaymentModal = ({ isOpen, table, duration, totalAmount, grossAmount, advanceAmount, commissionAmount, upiId: manualUpiId, rate, orderItems = [], onPaid, onClose }) => {
+const PaymentModal = ({ isOpen, table, duration, totalAmount, grossAmount, advanceAmount, commissionAmount, upiId: manualUpiId, merchantName, mcc, rate, orderItems = [], onPaid, onClose }) => {
   const [discountAmount, setDiscountAmount] = useState('');
+  const [showDiscountInput, setShowDiscountInput] = useState(false);
+  const [extraAmount, setExtraAmount] = useState('');
+  const [showExtraInput, setShowExtraInput] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('online');
   const [cashReceived, setCashReceived] = useState('');
-  const [showDiscountInput, setShowDiscountInput] = useState(false);
 
   // Reset local state whenever the modal opens to a fresh bill
   React.useEffect(() => {
     if (isOpen) {
       setDiscountAmount('');
       setCashReceived('');
+      setExtraAmount('');
       setShowDiscountInput(false);
+      setShowExtraInput(false);
       setPaymentMethod('online');
     }
   }, [isOpen]);
@@ -28,13 +32,16 @@ const PaymentModal = ({ isOpen, table, duration, totalAmount, grossAmount, advan
   const safeDuration = parseFloat(duration || 0);
 
   const parsedCash = parseFloat(cashReceived || 0);
-  const parsedDiscount = parseFloat(discountAmount || 0);
-  const finalTotal = Math.max(0, safeTotal - parsedDiscount);
+  const parsedDiscount = parseFloat(discountAmount) || 0;
+  const parsedExtra = parseFloat(extraAmount) || 0;
+  const finalTotal = Math.max(0, (safeTotal + parsedExtra) - parsedDiscount);
 
   const returnAmount = parsedCash > finalTotal ? parsedCash - finalTotal : 0;
 
   const upiId = manualUpiId || "example@upi"; 
-  const upiUrl = `upi://pay?pa=${upiId}&pn=Pool%20Cafe&am=${finalTotal.toFixed(2)}&cu=INR`;
+  const payeeName = encodeURIComponent(merchantName || "Pool Cafe");
+  const merchantCode = mcc || "0000";
+  const upiUrl = `upi://pay?pa=${upiId}&pn=${payeeName}&am=${finalTotal.toFixed(2)}&cu=INR&mc=${merchantCode}&mode=02&tn=Extra:${parsedExtra}`;
 
 
   const formatTime = (totalSeconds) => {
@@ -123,14 +130,24 @@ const PaymentModal = ({ isOpen, table, duration, totalAmount, grossAmount, advan
                 </div>
               )}
               
+              {parsedExtra > 0 && (
+                <div className="summary-line extra">
+                  <span>Extra</span>
+                  <span className="amount">+₹{parsedExtra.toLocaleString()}</span>
+                </div>
+              )}
+              
               <div className="summary-divider"></div>
 
               <div className="total-row">
                 <span className="label">Total</span>
-                <span className="amount">₹{finalTotal.toLocaleString()}</span>
+                <div className="total-main">
+                  ₹{finalTotal.toLocaleString()}
+                </div>
               </div>
 
               <div style={{ marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {/* Discount Section */}
                 {!showDiscountInput ? (
                   <button 
                     className="btn-discount-toggle"
@@ -151,6 +168,33 @@ const PaymentModal = ({ isOpen, table, duration, totalAmount, grossAmount, advan
                     <button 
                       className="btn-discount-apply"
                       onClick={() => setShowDiscountInput(false)}
+                    >
+                      Done
+                    </button>
+                  </div>
+                )}
+
+                {/* Extra Money Section */}
+                {!showExtraInput ? (
+                  <button 
+                    className="btn-extra-toggle"
+                    onClick={() => setShowExtraInput(true)}
+                  >
+                    + Add Extra Money
+                  </button>
+                ) : (
+                  <div className="extra-input-wrapper">
+                    <input 
+                      type="number" 
+                      className="extra-input"
+                      placeholder="Enter extra amount"
+                      value={extraAmount}
+                      onChange={(e) => setExtraAmount(e.target.value)}
+                      autoFocus
+                    />
+                    <button 
+                      className="btn-extra-apply"
+                      onClick={() => setShowExtraInput(false)}
                     >
                       Done
                     </button>

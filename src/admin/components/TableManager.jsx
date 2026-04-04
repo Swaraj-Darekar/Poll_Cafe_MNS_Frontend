@@ -36,7 +36,7 @@ const TableManager = ({ onUpdateStats }) => {
   // Payment Modal State
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [paymentData, setPaymentData] = useState(null);
-  const [settings, setSettings] = useState({ price_per_hour: 100, upi_id: 'example@upi' });
+  const [settings, setSettings] = useState({ price_per_hour: 100, upi_id: 'example@upi', merchant_name: 'Pool Cafe', mcc: '0000' });
   const [isStarting, setIsStarting] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -317,6 +317,8 @@ const TableManager = ({ onUpdateStats }) => {
           advanceAmount: response.advance_amount,
           commissionAmount: response.commission_amount,
           upiId: response.upi_id || settings.upi_id,
+          merchantName: settings.merchant_name, // Pass merchant name
+          mcc: settings.mcc, // Pass MCC
           rate: response.rate,
           orderItems: currentOrders // Pass order items to PaymentModal
         });
@@ -330,40 +332,38 @@ const TableManager = ({ onUpdateStats }) => {
     }
   };
 
-  const handleMarkAsPaid = async (paymentMethod, discountedAmount, discountApplied) => {
-    if (!paymentData) return;
+  const handleMarkAsPaid = async (paymentMethod, finalTotal, discountAmount, extraAmount) => {
+    if (!paymentData || isStarting) return;
     
-    const tableId = paymentData.table.id;
-    // Use the discounted amount passed from PaymentModal, otherwise fallback to the original total
-    const finalAmount = discountedAmount !== undefined ? discountedAmount : paymentData.totalAmount;
+    setIsStarting(true);
+    const tableId = paymentData.table?.id;
     const sessionId = paymentData.sessionId;
+
     const payloadData = {
-        total_amount: finalAmount,
+        total_amount: finalTotal,
         gross_amount: paymentData.grossAmount,
         commission_amount: paymentData.commissionAmount,
-        discount_amount: discountApplied || 0, // Track discount in backend payload if supported
+        discount_amount: parseFloat(discountAmount) || 0,
+        extra_amount: parseFloat(extraAmount) || 0,
         duration_minutes: paymentData.durationMinutes,
         payment_method: paymentMethod || 'online'
     };
-
 
     // Close modal and update UI instantly (Optimistic UI)
     setIsPaymentModalOpen(false);
     
     // For Take Away, we just clear the orders and update sales stats
     if (tableId === 'takeaway') {
-      handleAddSale(finalAmount, payloadData.payment_method, true);
+      handleAddSale(finalTotal, payloadData.payment_method, true);
       setPaymentData(null);
+      setIsStarting(false);
       clearTableOrders('takeaway');
       setTableOrders(getTableOrders());
       // Persist to backend so analytics picks it up
       try {
-        const result = await recordTakeawaySale(finalAmount, payloadData.payment_method);
-
+        const result = await recordTakeawaySale(finalTotal, payloadData.payment_method);
         if (!result || result.detail) {
           console.error('Takeaway sale backend record failed:', result);
-        } else {
-          console.log('Takeaway sale recorded in backend:', result);
         }
       } catch (err) {
         console.error('Error recording takeaway sale to backend:', err);
@@ -386,17 +386,18 @@ const TableManager = ({ onUpdateStats }) => {
         sessionId: null 
     } : t));
     
-    handleAddSale(finalAmount, payloadData.payment_method);
+    handleAddSale(finalTotal, payloadData.payment_method);
     setPaymentData(null);
     clearTableOrders(tableId); // Important: Clear orders after payment
     setTableOrders(getTableOrders()); // Refresh state
 
-
     try {
       await markPaid(sessionId, payloadData);
+      setIsStarting(false);
       fetchTables(); // Sync without blocking
     } catch (error) {
       console.error('Error marking as paid:', error);
+      setIsStarting(false);
       fetchTables(); // Reset on error
     }
   };
@@ -509,6 +510,8 @@ const TableManager = ({ onUpdateStats }) => {
         advanceAmount={paymentData?.advanceAmount}
         commissionAmount={paymentData?.commissionAmount}
         upiId={paymentData?.upiId}
+        merchantName={paymentData?.merchantName}
+        mcc={paymentData?.mcc}
         rate={paymentData?.rate}
         orderItems={paymentData?.orderItems}
         onPaid={handleMarkAsPaid}

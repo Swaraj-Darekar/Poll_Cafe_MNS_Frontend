@@ -230,6 +230,64 @@
   box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2);
 }
 
+/* Extra Money Styles (Green flavor) */
+.btn-extra-toggle {
+  background: transparent;
+  color: #16a34a;
+  border: 1px dashed #16a34a;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+}
+
+.btn-extra-toggle:hover {
+  background: rgba(22, 163, 74, 0.05);
+  transform: translateY(-1px);
+}
+
+.extra-input-wrapper {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  animation: slideDown 0.2s ease-out;
+}
+
+.extra-input {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 2px solid #16a34a;
+  background: white;
+  color: #0f172a;
+  font-size: 0.95rem;
+  font-weight: 600;
+  outline: none;
+}
+
+.btn-extra-apply {
+  background: #16a34a;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-extra-apply:hover {
+  background: #15803d;
+  box-shadow: 0 4px 10px rgba(22, 163, 74, 0.2);
+}
+
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
